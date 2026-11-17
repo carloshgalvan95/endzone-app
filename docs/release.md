@@ -60,7 +60,22 @@ git push origin v0.1.0
 
 The workflow checks that the tag, `package.json`, and `app.json` name the same version. The APK asset is `endzone-X.Y.Z.apk`.
 
-It installs the Android `compileSdk`, build-tools, and NDK named in `node_modules/react-native/gradle/libs.versions.toml`. That is the catalog `expo prebuild` uses. The keystore is written only after that project exists, and only from the secrets.
+The job uses JDK 17. Android Gradle plugin 9.2, which React Native 0.88 brings in, requires JDK 17. It does not require JDK 21.
+
+SDK packages come from `node_modules/react-native/gradle/libs.versions.toml`. The catalog's `compileSdk = "37"` is not the package id `platforms;android-37`. Current `sdkmanager --list` output names that platform `platforms/android-37.0` (older tools use a semicolon, and some builds add an `-ext` suffix). `scripts/install-android-sdk.sh` updates cmdline-tools when the index does not contain a matching platform, then installs the platform, build-tools, and NDK ids it resolved. It also installs CMake 3.30.5 when that package is listed, because the native build needs CMake and React Native 0.88 names that version. If a package still cannot be resolved, or sdkmanager cannot install it, the step continues. Licenses are accepted so Gradle can download the missing pieces. `assembleRelease` still fails the job when the build fails. The keystore is written only after prebuild, and only from the secrets.
+
+## Re-run v0.1.0
+
+The first `v0.1.0` run failed while choosing SDK packages, before GitHub created a release. After this fix is on `main`, delete that tag and push it again at the fixed commit:
+
+```bash
+git push origin :refs/tags/v0.1.0
+git tag -d v0.1.0
+git checkout main
+git pull origin main
+git tag v0.1.0
+git push origin v0.1.0
+```
 
 ## What I do not do
 

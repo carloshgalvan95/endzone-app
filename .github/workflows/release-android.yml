@@ -25,6 +25,8 @@ jobs:
           node-version: 22
           cache: npm
 
+      # Android Gradle plugin 9.2, used by React Native 0.88, requires JDK 17.
+      # It does not require JDK 21.
       - name: Setup Java
         uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
@@ -60,25 +62,7 @@ jobs:
         run: npx expo prebuild --platform android --no-install
 
       - name: Install the SDK packages from the React Native version catalog
-        run: |
-          set -eu
-          catalog="node_modules/react-native/gradle/libs.versions.toml"
-          if [ ! -f "$catalog" ]; then
-            echo "::error::Could not find ${catalog}. Expo prebuild reads compileSdk, buildTools, and ndkVersion from that catalog."
-            exit 1
-          fi
-          read_ver() {
-            grep -E "^${1} *= *" "$catalog" | head -1 | sed -E 's/.*= *"([^"]+)".*/\1/'
-          }
-          sdk="$(read_ver compileSdk)"
-          tools="$(read_ver buildTools)"
-          ndk="$(read_ver ndkVersion)"
-          if [ -z "$sdk" ] || [ -z "$tools" ] || [ -z "$ndk" ]; then
-            echo "::error::The React Native version catalog is missing compileSdk, buildTools, or ndkVersion."
-            exit 1
-          fi
-          echo "Installing platforms;android-${sdk} build-tools;${tools} ndk;${ndk}"
-          sdkmanager --install "platforms;android-${sdk}" "build-tools;${tools}" "ndk;${ndk}"
+        run: bash scripts/install-android-sdk.sh
 
       - name: Write the release keystore from secrets
         env:
