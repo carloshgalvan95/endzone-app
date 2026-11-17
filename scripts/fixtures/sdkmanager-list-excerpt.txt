@@ -1,0 +1,12 @@
+Available packages:
+  build-tools/37.0.0                                                                      37.0.0                                 Android SDK Build-Tools 37
+  build-tools/37.0.0-rc1                                                                  37.0.0-rc.1                            Android SDK Build-Tools 37-rc1
+  cmake/3.30.5                                                                            3.30.5                                 CMake 3.30.5
+  ndk/27.1.12297006                                                                       27.1.12297006                          NDK (Side by side) 27.1.12297006
+  platforms/android-36                                                                    2.0.0                                  Android SDK Platform 36
+  platforms/android-36-ext19                                                              1.0.0                                  Android SDK Platform 36-ext19
+  platforms/android-36.1                                                                  1.0.0                                  Android SDK Platform 36.1
+  platforms/android-37.0                                                                  2.0.0                                  Android SDK Platform 37.0
+  platforms/android-37.1                                                                  1.0.0                                  Android SDK Platform 37.1
+  platforms/android-37.2                                                                  2.0.0                                  Android SDK Platform 37.2
+  platforms/android-37.2-beta3                                                            3.0.0                                  Android SDK Platform 37.2-beta3

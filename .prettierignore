@@ -7,3 +7,5 @@ coverage
 package-lock.json
 contracts/v1/*.schema.json
 assets
+*.sh
+scripts/fixtures/*.txt
