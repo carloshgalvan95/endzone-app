@@ -1,0 +1,119 @@
+name: Release Android
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-android-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Require a matching version tag
+        run: |
+          set -eu
+          tag="${GITHUB_REF_NAME}"
+          package_version="$(node -p "require('./package.json').version")"
+          app_version="$(node -p "require('./app.json').expo.version")"
+          if [ "$tag" != "v${package_version}" ] || [ "$package_version" != "$app_version" ]; then
+            echo "::error::Tag ${tag} does not match package.json (${package_version}) and app.json (${app_version}). Use one vX.Y.Z tag for both."
+            exit 1
+          fi
+
+      - name: Require Android signing secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: node scripts/write-android-signing.mjs --check
+
+      - name: Install
+        run: npm ci
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+
+      - name: Prebuild the Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Install the SDK packages from the React Native version catalog
+        run: |
+          set -eu
+          catalog="node_modules/react-native/gradle/libs.versions.toml"
+          if [ ! -f "$catalog" ]; then
+            echo "::error::Could not find ${catalog}. Expo prebuild reads compileSdk, buildTools, and ndkVersion from that catalog."
+            exit 1
+          fi
+          read_ver() {
+            grep -E "^${1} *= *" "$catalog" | head -1 | sed -E 's/.*= *"([^"]+)".*/\1/'
+          }
+          sdk="$(read_ver compileSdk)"
+          tools="$(read_ver buildTools)"
+          ndk="$(read_ver ndkVersion)"
+          if [ -z "$sdk" ] || [ -z "$tools" ] || [ -z "$ndk" ]; then
+            echo "::error::The React Native version catalog is missing compileSdk, buildTools, or ndkVersion."
+            exit 1
+          fi
+          echo "Installing platforms;android-${sdk} build-tools;${tools} ndk;${ndk}"
+          sdkmanager --install "platforms;android-${sdk}" "build-tools;${tools}" "ndk;${ndk}"
+
+      - name: Write the release keystore from secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: node scripts/write-android-signing.mjs
+
+      - name: Build the signed release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        env:
+          GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx2g -Dorg.gradle.workers.max=2'
+
+      - name: Name the APK
+        run: |
+          set -eu
+          version="${GITHUB_REF_NAME#v}"
+          apk="$(find android/app/build/outputs/apk/release -name '*.apk' -print -quit)"
+          if [ -z "$apk" ]; then
+            echo "::error::Gradle did not produce a release APK."
+            exit 1
+          fi
+          cp "$apk" "endzone-${version}.apk"
+
+      - name: Upload the APK artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: endzone-${{ github.ref_name }}
+          path: endzone-*.apk
+          if-no-files-found: error
+
+      - name: Attach the APK to the GitHub Release
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
+        with:
+          files: endzone-*.apk
+          fail_on_unmatched_files: true
