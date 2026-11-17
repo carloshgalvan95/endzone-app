@@ -1,0 +1,11 @@
+{
+  "source_repo": "carloshgalvan95/endzone-mlops",
+  "source_commit": "b9f8342c4e24009ce74a942d82b285626259a43e",
+  "source_path": "contracts/site-data/v1",
+  "algorithm": "sha256",
+  "files": {
+    "slate.schema.json": "e16de6b536b59f3371567c61122d427ee97c31d685772f7da78ac21f31e7544d",
+    "teams.schema.json": "4f8da8f6e8d94270e60584b1cd0c534c6c4b87a4d7885dcbc09e0288f72f7f64",
+    "track_record.schema.json": "b86f77d7b2de975c2c87ceca06d0cc294cf5085f4a868a8308a7a6408aa1ec95"
+  }
+}

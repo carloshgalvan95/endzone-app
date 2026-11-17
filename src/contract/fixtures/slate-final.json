@@ -1,0 +1,70 @@
+{
+  "contract_version": "1.0.0",
+  "sample": false,
+  "season": 2026,
+  "week": 10,
+  "weeks_available": [9, 10],
+  "generated_at": "2026-11-10T15:44:48Z",
+  "results_updated_at": "2026-11-17T16:29:16Z",
+  "model_name": "workspace.nfl_dev.endzone_winprob",
+  "model_version": "2@prod",
+  "model_alias": "prod",
+  "feature_set": "h2_full",
+  "threshold_pp": 5,
+  "score_model": {
+    "feature_set": "h2_full",
+    "accepted": true,
+    "hidden_reason": null,
+    "margin": {
+      "decision": "accepted",
+      "baseline_name": "Elo/25",
+      "mae": 10.1,
+      "baseline_mae": 11.0,
+      "market_mae": 9.5
+    },
+    "total": {
+      "decision": "accepted",
+      "baseline_name": "League mean",
+      "mae": 12.0,
+      "baseline_mae": 13.0,
+      "market_mae": 11.0
+    }
+  },
+  "games": [
+    {
+      "game_id": "2026_10_WAS_NYG",
+      "kickoff": "2026-11-12T20:15:00-05:00",
+      "home": "NYG",
+      "away": "WAS",
+      "model_home_wp": 0.718526,
+      "market_home_wp": 0.542744,
+      "diff": 0.175782,
+      "model_version": "2@prod",
+      "generated_at": "2026-11-10T15:44:48Z",
+      "status": "final",
+      "estimated_margin": 6.975388,
+      "estimated_total": 47.808805,
+      "estimated_home_points": 27.392096,
+      "estimated_away_points": 20.416709,
+      "home_score": 21,
+      "away_score": 24,
+      "result": "away"
+    },
+    {
+      "game_id": "2026_10_CLE_PIT",
+      "kickoff": "2026-11-15",
+      "home": "PIT",
+      "away": "CLE",
+      "model_home_wp": 0.5,
+      "market_home_wp": null,
+      "diff": null,
+      "model_version": "2@prod",
+      "generated_at": "2026-11-10T15:44:48Z",
+      "status": "scheduled",
+      "estimated_margin": null,
+      "estimated_total": null,
+      "estimated_home_points": null,
+      "estimated_away_points": null
+    }
+  ]
+}
