@@ -1,0 +1,11 @@
+{
+  "contract_version": "1.0.0",
+  "available": false,
+  "reason": "archive_unreachable",
+  "generated_at": "2026-11-17T00:00:00Z",
+  "method": "ADR-008",
+  "method_url": "https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/adr/ADR-008-weekly-track-record.md",
+  "probability_clip": 0.000001,
+  "small_sample_decided": 48,
+  "seasons": []
+}

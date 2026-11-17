@@ -1,0 +1,51 @@
+{
+  "contract_version": "1.0.0",
+  "sample": true,
+  "is_example": true,
+  "label": "Example slate. These are not real predictions.",
+  "season": null,
+  "week": null,
+  "weeks_available": [],
+  "generated_at": "2026-11-04T00:00:00Z",
+  "model_name": "endzone-winprob",
+  "model_version": "example",
+  "feature_set": "h2_full",
+  "threshold_pp": 5,
+  "score_model": {
+    "feature_set": "h2_full",
+    "accepted": false,
+    "hidden_reason": "Estimate hidden because the pre-registered test has not been run.",
+    "margin": {
+      "decision": "not_run",
+      "baseline_name": "Elo/25",
+      "mae": null,
+      "baseline_mae": null,
+      "market_mae": null
+    },
+    "total": {
+      "decision": "not_run",
+      "baseline_name": "League mean",
+      "mae": null,
+      "baseline_mae": null,
+      "market_mae": null
+    }
+  },
+  "games": [
+    {
+      "game_id": "EXAMPLE-01",
+      "status": "scheduled",
+      "kickoff": "2026-11-05T19:15:00-06:00",
+      "home": "PIT",
+      "away": "CLE",
+      "model_home_wp": 0.64,
+      "market_home_wp": 0.61,
+      "diff": 0.03,
+      "model_version": "example",
+      "generated_at": "2026-11-04T00:00:00Z",
+      "estimated_margin": null,
+      "estimated_total": null,
+      "estimated_home_points": null,
+      "estimated_away_points": null
+    }
+  ]
+}
