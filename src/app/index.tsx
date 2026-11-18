@@ -103,6 +103,15 @@ function LoadedHome({ selection }: { selection: SlateSelection }) {
         teamsQuery.refetch().catch(() => undefined);
       }}
       onOpenWeeks={openWeeks}
+      onOpenGame={(gameId) => {
+        router.push({
+          pathname: '/game/[gameId]',
+          params:
+            selection.kind === 'week'
+              ? { gameId, season: String(selection.season), week: String(selection.week) }
+              : { gameId },
+        });
+      }}
     />
   );
 }

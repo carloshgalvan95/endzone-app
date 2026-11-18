@@ -90,6 +90,47 @@ export function formatKickoff(kickoff: string): string {
   }
 }
 
+/**
+ * Clock time in a zone. Omit `timeZone` to use the device zone.
+ * A date with no clock stays a date.
+ */
+export function formatKickoffInZone(kickoff: string, timeZone?: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) {
+    const [yearText, monthText, dayText] = kickoff.split('-');
+    const year = Number(yearText);
+    const month = Number(monthText);
+    const day = Number(dayText);
+    if (!year || !month || !day) {
+      return kickoff;
+    }
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const formatted = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'UTC',
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
+    return `No clock time was published. ${formatted}.`;
+  }
+  const date = new Date(kickoff);
+  if (Number.isNaN(date.getTime())) {
+    return kickoff;
+  }
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }).format(date);
+  } catch {
+    return kickoff;
+  }
+}
+
 export function formatUtcDay(stamp: string): string {
   const date = new Date(stamp);
   if (Number.isNaN(date.getTime())) {

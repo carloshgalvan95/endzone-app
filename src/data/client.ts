@@ -1,6 +1,6 @@
-import { parseSlate, parseTeams } from '@/contract/validate';
-import type { Slate, TeamsDocument } from '@/contract/types';
-import { slateUrl, teamsUrl, type SlateSelection } from '@/contract/urls';
+import { parseSlate, parseTeams, parseTrackRecord } from '@/contract/validate';
+import type { Slate, TeamsDocument, TrackRecordDocument } from '@/contract/types';
+import { slateUrl, teamsUrl, trackRecordUrl, type SlateSelection } from '@/contract/urls';
 
 async function fetchJson(url: string): Promise<unknown> {
   let response: Response;
@@ -27,4 +27,8 @@ export async function fetchSlate(selection: SlateSelection): Promise<Slate> {
 
 export async function fetchTeams(): Promise<TeamsDocument> {
   return parseTeams(await fetchJson(teamsUrl()));
+}
+
+export async function fetchTrackRecord(): Promise<TrackRecordDocument> {
+  return parseTrackRecord(await fetchJson(trackRecordUrl()));
 }

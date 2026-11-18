@@ -25,7 +25,7 @@ endzone-mlops scores the week and writes JSON. GitHub Pages serves that JSON at 
 | `latest.json`                       | Current slate. Home screen when no week is selected. |
 | `predictions/<season>-w<week>.json` | One week, same shape as `latest.json`.               |
 | `teams.json`                        | Names, colors, and logo URLs.                        |
-| `track_record.json`                 | Derived record. Parsed, not shown yet.               |
+| `track_record.json`                 | Derived record. The Record screen reads it.          |
 | `sample.json`                       | Example slate (`sample: true`).                      |
 
 A missing `contract_version` means major 1, because files published before the field existed are still valid. A different major shows an update state instead of rendering a shape this version does not know.
@@ -34,9 +34,14 @@ A missing `contract_version` means major 1, because files published before the f
 
 1. Weekly slate, the home screen. Season and week, model version, one card per game. Each card shows both teams, the model home win probability, the market probability and the difference, the estimated margin and total, and the final score when the game is final. An example slate (`sample: true`) shows an example banner. Loading, empty, error, offline-stale, and contract-update states are all on this screen.
 2. Week picker. The list is `weeks_available` from the open slate.
-3. About. The market has the lower log loss. This is not betting advice. Links to the model card, the repository, and the site.
+3. About. The market has the lower log loss. This is not a recommendation. Links to the model card, the repository, and the site.
+4. Record. Per week and season to date correct picks, plus model and market log loss. A small sample is labeled as one. The sentence follows the published numbers. On the current file the market has the lower log loss.
+5. Game detail. Tap a game. It shows the model home probability, the market comparison when the file has one, kickoff in the phone's local time, and the result when the game is final.
+6. Alerts. A Tuesday local notification, off until you turn it on. It stays on the phone. There is no push server.
 
-Track record, game detail, and notifications are the next version. `src/features/track-record/`, `src/features/game-detail/`, and `src/features/notifications/` are the seams. They are not screens yet.
+## Download
+
+Release files are split by CPU so a phone does not download every architecture. On a recent phone, install `endzone-<version>-arm64-v8a.apk`. On an older 32-bit phone, install `endzone-<version>-armeabi-v7a.apk`. The universal file contains both and is the larger download. See [docs/release.md](docs/release.md).
 
 ## Run
 
@@ -75,7 +80,7 @@ Colors, type, and spacing follow the site tokens (cream, black, blue, crimson, y
 
 ## Release
 
-Semantic versions. The app version in `package.json` and `app.json` is `0.1.0`, and `android.versionCode` is `1`. A GitHub release tag `vX.Y.Z` builds a signed Android APK. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
+Semantic versions. The app version in `package.json` and `app.json` is `0.1.0`, and `android.versionCode` is `2`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
 
 ## License
 

@@ -58,7 +58,17 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-The workflow checks that the tag, `package.json`, and `app.json` name the same version. The APK asset is `endzone-X.Y.Z.apk`.
+The workflow checks that the tag, `package.json`, and `app.json` name the same version.
+
+The release build splits the APK by CPU:
+
+| File                            | Who should install it                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `endzone-X.Y.Z-arm64-v8a.apk`   | Most phones from the last several years. This is the small download.                             |
+| `endzone-X.Y.Z-armeabi-v7a.apk` | Older 32-bit phones.                                                                             |
+| `endzone-X.Y.Z-universal.apk`   | Use this only if you do not know the CPU. It is larger because it contains both of those builds. |
+
+`android.versionCode` in `app.json` is the universal APK version. The arm64 file uses `versionCode * 1000 + 2`, and the 32-bit file uses `versionCode * 1000 + 1`, so either split installs over an older universal APK. Do not install the universal file over a phone that already has a split APK. That would be a lower version.
 
 The job uses JDK 17. Android Gradle plugin 9.2, which React Native 0.88 brings in, requires JDK 17. It does not require JDK 21.
 
