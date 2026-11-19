@@ -4,18 +4,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ContractUpdateRequiredError } from '@/contract/errors';
 import { useTrackRecord } from '@/data/queries';
 import { useI18n } from '@/i18n/LocaleProvider';
-import { darkPalette, field, font, nav } from '@/theme/h2';
+import { field, font, nav } from '@/theme/h2';
+import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { BottomNav } from './Chrome';
 
 export function HistoryScreen() {
-  const { t, numberLocale } = useI18n();
+  const { t } = useI18n();
+  const { palette } = useH2Theme();
   const insets = useSafeAreaInsets();
   const query = useTrackRecord();
   const record = query.data;
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: palette.bg }]}>
       <ScrollView
         style={styles.list}
         contentContainerStyle={{
@@ -25,53 +27,76 @@ export function HistoryScreen() {
           gap: 16,
         }}
       >
-        <Text style={styles.kicker}>{t('hist.kicker')}</Text>
+        <Text style={[styles.kicker, { color: palette.textMuted }]}>{t('hist.kicker')}</Text>
         {query.error instanceof ContractUpdateRequiredError ? (
-          <Text style={styles.body}>{t('week.contract')}</Text>
+          <Text style={[styles.body, { color: palette.text }]}>{t('week.contract')}</Text>
         ) : null}
-        {!record && query.isPending ? <Text style={styles.body}>{t('tb.loading')}</Text> : null}
-        {!record && query.isError ? <Text style={styles.body}>{t('hist.na')}</Text> : null}
-        {record && !record.available ? <Text style={styles.body}>{t('hist.na')}</Text> : null}
+        {!record && query.isPending ? (
+          <Text style={[styles.body, { color: palette.text }]}>{t('tb.loading')}</Text>
+        ) : null}
+        {!record && query.isError ? (
+          <Text style={[styles.body, { color: palette.text }]}>{t('hist.na')}</Text>
+        ) : null}
+        {record && !record.available ? (
+          <Text style={[styles.body, { color: palette.text }]}>{t('hist.na')}</Text>
+        ) : null}
         {record?.available
           ? record.seasons.map((season) => {
               const hits = season.summary.pick_hits;
               const judged = season.summary.pick_hits + season.summary.pick_misses;
               return (
                 <View key={season.season} style={styles.block}>
-                  <Text style={styles.title}>{t('hist.season', { y: season.season })}</Text>
-                  <View style={styles.tile}>
-                    <Text style={styles.tileTitle}>{t('hist.title')}</Text>
-                    <Text style={styles.tileBody}>{t('hist.sub')}</Text>
-                    <Text style={styles.tileBody}>{t('how.honest')}</Text>
+                  <Text style={[styles.title, { color: palette.text }]}>
+                    {t('hist.season', { y: season.season })}
+                  </Text>
+                  <View style={[styles.tile, { backgroundColor: palette.surface }]}>
+                    <Text style={[styles.tileTitle, { color: palette.text }]}>
+                      {t('hist.title')}
+                    </Text>
                   </View>
-                  <Text style={styles.calls}>{t('hist.calls')}</Text>
-                  <Text style={styles.figure}>{t('hist.calls.n', { hits, n: judged })}</Text>
-                  <Text style={styles.muted}>{t('hist.calls.note')}</Text>
-                  <Text style={styles.muted}>
+                  <Text style={[styles.calls, { color: palette.textMuted }]}>
+                    {t('hist.calls')}
+                  </Text>
+                  <Text style={[styles.figure, { color: palette.text }]}>
+                    {t('hist.calls.n', { hits, n: judged })}
+                  </Text>
+                  <Text style={[styles.muted, { color: palette.textMuted }]}>
+                    {t('hist.calls.note')}
+                  </Text>
+                  <Text style={[styles.muted, { color: palette.textMuted }]}>
                     {t('hist.sample', {
                       have: season.summary.decided,
                       need: record.small_sample_decided,
                     })}
                   </Text>
-                  <Text style={styles.kicker}>{t('hist.weekly')}</Text>
-                  {season.weeks.map((week) => (
-                    <Dumbbell
-                      key={`${week.season}-${week.week}`}
-                      label={
-                        week.state === 'no_finals'
-                          ? t('tb.dumbbell.none', { n: week.week })
-                          : t('tb.dumbbell', {
-                              n: week.week,
-                              mo: formatLoss(week.model_log_loss, numberLocale),
-                              mk: formatLoss(week.market_log_loss, numberLocale),
-                            })
-                      }
-                      model={week.model_log_loss}
-                      market={week.market_log_loss}
-                      empty={week.state === 'no_finals'}
-                      emptyLabel={t('hist.nofinals')}
-                    />
-                  ))}
+                  <Text style={[styles.kicker, { color: palette.textMuted }]}>
+                    {t('hist.weekly')}
+                  </Text>
+                  {season.weeks.map((week) => {
+                    const weekHits = week.pick_hits;
+                    const weekMisses = week.pick_misses;
+                    const decided = weekHits + weekMisses;
+                    const empty = week.state === 'no_finals' || decided === 0;
+                    return (
+                      <WeekHits
+                        key={`${week.season}-${week.week}`}
+                        label={
+                          empty
+                            ? t('hist.nofinals')
+                            : t('tb.weekhits', {
+                                n: week.week,
+                                hits: weekHits,
+                                decided,
+                              })
+                        }
+                        rate={empty ? 0 : weekHits / decided}
+                        empty={empty}
+                        ring={palette.model}
+                        fieldColor={palette.playField}
+                        text={palette.textMuted}
+                      />
+                    );
+                  })}
                 </View>
               );
             })
@@ -82,88 +107,67 @@ export function HistoryScreen() {
   );
 }
 
-function formatLoss(value: number | null, locale: string): string {
-  if (value == null || !Number.isFinite(value)) {
-    return 'n/a';
-  }
-  return value.toLocaleString(locale, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-}
-
-function Dumbbell({
+function WeekHits({
   label,
-  model,
-  market,
+  rate,
   empty,
-  emptyLabel,
+  ring,
+  fieldColor,
+  text,
 }: {
   label: string;
-  model: number | null;
-  market: number | null;
+  rate: number;
   empty: boolean;
-  emptyLabel: string;
+  ring: string;
+  fieldColor: string;
+  text: string;
 }) {
-  const span = 0.8 - 0.4;
-  const place = (value: number | null) => {
-    if (value == null) {
-      return 0;
-    }
-    return Math.min(1, Math.max(0, (value - 0.4) / span));
-  };
   return (
-    <View accessibilityLabel={label} style={styles.dumbbell}>
-      <Text style={styles.muted}>{empty ? emptyLabel : label}</Text>
-      {!empty && model != null && market != null ? (
-        <View style={styles.axis}>
+    <View accessibilityLabel={label} style={styles.row}>
+      <Text style={[styles.muted, { color: text }]}>{label}</Text>
+      {empty ? null : (
+        <View style={[styles.axis, { backgroundColor: fieldColor }]}>
           <View
             style={[
-              styles.ring,
-              { left: `${place(model) * 100}%`, borderColor: darkPalette.model },
+              styles.mark,
+              {
+                left: `${Math.min(1, Math.max(0, rate)) * 100}%`,
+                borderColor: ring,
+                backgroundColor: fieldColor,
+              },
             ]}
           />
-          <Text style={[styles.cross, { left: `${place(market) * 100}%` }]}>x</Text>
         </View>
-      ) : null}
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: darkPalette.bg },
+  screen: { flex: 1 },
   list: { flex: 1 },
   block: { gap: 8 },
   kicker: {
-    color: darkPalette.textMuted,
     fontFamily: font.monoMedium,
     fontSize: 12,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  title: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 24 },
-  tile: { backgroundColor: darkPalette.text, borderRadius: 16, padding: 16, gap: 6 },
-  tileTitle: { color: darkPalette.textInverse, fontFamily: font.sansBold, fontSize: 18 },
-  tileBody: { color: darkPalette.textInverse, fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
-  calls: { color: darkPalette.textMuted, fontFamily: font.sansMedium, fontSize: 14 },
-  figure: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 40 },
-  muted: { color: darkPalette.textMuted, fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
-  body: { color: darkPalette.text, fontFamily: font.sans, fontSize: 16 },
-  dumbbell: { gap: 6, minHeight: 48 },
-  axis: {
-    height: 24,
-    backgroundColor: darkPalette.playField,
-    borderRadius: 0,
-    justifyContent: 'center',
-  },
-  ring: {
+  title: { fontFamily: font.sansBold, fontSize: 24 },
+  tile: { borderRadius: 16, padding: 16 },
+  tileTitle: { fontFamily: font.sansBold, fontSize: 18, lineHeight: 24 },
+  calls: { fontFamily: font.sansMedium, fontSize: 14 },
+  figure: { fontFamily: font.sansBold, fontSize: 40 },
+  muted: { fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
+  body: { fontFamily: font.sans, fontSize: 16 },
+  row: { gap: 6, minHeight: 48 },
+  axis: { height: 24, justifyContent: 'center' },
+  mark: {
     position: 'absolute',
     width: field.modelRing,
     height: field.modelRing,
+    marginLeft: -field.modelRing / 2,
     borderRadius: field.modelRing / 2,
     borderWidth: field.modelStroke,
-  },
-  cross: {
-    position: 'absolute',
-    color: darkPalette.market,
-    fontFamily: font.monoSemi,
-    fontSize: 14,
   },
 });

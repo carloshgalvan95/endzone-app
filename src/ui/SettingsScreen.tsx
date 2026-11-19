@@ -192,7 +192,7 @@ export function SettingsScreen() {
           {t('set.version')}
         </Text>
         <Text style={[styles.body, { color: palette.text }]}>
-          {Constants.expoConfig?.version ?? '0.3.0'}
+          {Constants.expoConfig?.version ?? '0.3.1'}
         </Text>
         <Text style={[styles.body, { color: palette.text }]}>{t('set.about.body')}</Text>
       </ScrollView>

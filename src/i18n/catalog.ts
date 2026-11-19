@@ -35,8 +35,6 @@ export const en = {
   'detail.countdown.short': 'Starts in {h} h {m} m',
   'detail.countdown.min': 'Starts in {m} min',
   'detail.footer': 'Open ML experiment. Not a recommendation.',
-  'how.honest':
-    'In 2026 the market has a lower log loss than the model. This is not a recommendation.',
   'how.cover':
     'The cover figure names the model favorite. pFav = max(p, 1-p). n is 5 to 9. Below 55 percent: Toss-up. From 95 percent: More than 9 in 10.',
   'how.field':
@@ -48,10 +46,9 @@ export const en = {
   'field.visitor': 'Visitor',
   'field.home': 'Home',
   'hist.season': 'Season {y}',
-  'hist.title': 'The market is better calibrated.',
-  'hist.sub': 'Its log loss is lower. Lower is better.',
+  'hist.title': 'Correct calls this season.',
   'hist.sample': '{have} of {need} decided games, the contract threshold.',
-  'hist.weekly': 'Log loss by week · lower is better',
+  'hist.weekly': 'Correct calls by week',
   'hist.nofinals': 'No finals',
   'hist.calls': 'Correct calls',
   'hist.calls.n': '{hits} of {n}',
@@ -101,9 +98,7 @@ export const en = {
     'According to the model, this is a toss-up. In 10 games like this, each side wins about 5.',
   'tb.cover.more9': 'According to the model, in more than 9 of 10 games like this, {team} win.',
   'tb.field': 'Probability field. The model gives {team} {pm} percent.',
-  'tb.dumbbell':
-    'Week {n}. Model log loss {mo}. Market log loss {mk}. The market is lower, which is better.',
-  'tb.dumbbell.none': 'Week {n}. No finals.',
+  'tb.weekhits': 'Week {n}. {hits} of {decided} correct calls.',
   'tb.widget':
     'Next game: {away} at {home}. The model gives {team} {n} in 10. Updated {dt}. Double tap to open the game.',
   'tb.widget.empty': 'No games yet. Double tap to open the app.',
@@ -179,17 +174,11 @@ export const en = {
   'how.s5.diag': 'If it were exact',
   'how.s5.cd':
     'A calibration curve of what the model said versus what later happened, from the holdout 2024 to 2025. Ten groups of games, from lowest to highest p, 57 games in each, 570 games in all. A weekly strip of correct calls, {k} of {n}, on decided games, with an example of 23 of 29.',
-  'how.s6.title': 'The market stays as an honest reference.',
+  'how.s6.title': 'The method is public.',
   'how.s6.p1':
-    'Log loss is a score for how close the probabilities were to what happened. Lower is better.',
-  'how.s6.p2':
-    'On the holdout from 2024 to 2025, {n} games, the market has a lower log loss than the model, {market} against {model}. This is an open experiment, not a recommendation.',
-  'how.s6.p3': 'The bars share a scale from 0 to 1. Neither bar is colored as a winner.',
-  'how.s6.model': 'Model',
-  'how.s6.market': 'Market',
-  'how.s6.lower': 'Lower is better',
+    'The method, the data and the code are public. This is an open experiment, not a recommendation.',
   'how.s6.cd':
-    'A log loss comparison on the holdout 2024 to 2025, 570 games. Model {model}. Market {market}. Lower is better. The market is lower. A secondary 2026 season to date row, small sample, with {model_ll} and {market_ll}. A link to the model card.',
+    'The method, the data and the code are public. This is an open experiment, not a recommendation. A link to the model card.',
   'how.chart.empty': 'No chart data yet.',
   'how.chart.loading': 'Loading the chart.',
   'how.chart.error': 'The chart could not be loaded.',
@@ -204,7 +193,8 @@ export const en = {
   'how.s2.p_lab': 'p, home win probability',
   'how.s3.exact':
     'p is the probability that the home team wins. pFav is the larger of p and 1-p. n is pFav times 10, rounded half up, then kept between 5 and 9. Below 55 percent: Toss-up. From 95 percent: More than 9 in 10. It never says 10.',
-  'how.s4.foot': 'The gate uses log loss. Lower is better.',
+  'how.s4.foot':
+    'The gate uses log loss, a score for how close the probabilities were to what happened. Lower is better.',
   'how.s4.metric': 'log loss',
   'how.s4.exact':
     'The same model, retrained, passes if it is no more than 0.002 worse. A different model has to be strictly better.',
@@ -214,11 +204,6 @@ export const en = {
   'how.s5.holdout': 'Holdout 2024 to 2025',
   'how.s6.foot':
     'The method is public: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md',
-  'how.s6.market_lower': 'The market is lower',
-  'how.s6.holdout': 'Holdout 2024 to 2025',
-  'how.s6.n': '{n} games',
-  'how.s6.live': '2026 season to date, small sample',
-  'how.s6.live_ex': 'Example  0.559 vs 0.506',
 } as const;
 
 export const es = {
@@ -257,8 +242,6 @@ export const es = {
   'detail.countdown.short': 'Empieza en {h} h {m} min',
   'detail.countdown.min': 'Empieza en {m} min',
   'detail.footer': 'Experimento abierto de ML. Esto no es una recomendación.',
-  'how.honest':
-    'En 2026 el mercado tiene menor log loss que el modelo. Esto no es una recomendación.',
   'how.cover':
     'La cifra de portada nombra al favorito del modelo. pFav = max(p, 1-p). n va de 5 a 9. Por debajo de 55 por ciento: Juego parejo. Desde 95 por ciento: Más de 9 de cada 10.',
   'how.field':
@@ -270,10 +253,9 @@ export const es = {
   'field.visitor': 'Visitante',
   'field.home': 'Local',
   'hist.season': 'Temporada {y}',
-  'hist.title': 'El mercado está mejor calibrado.',
-  'hist.sub': 'Su log loss es más bajo. Más bajo es mejor.',
+  'hist.title': 'Aciertos de esta temporada.',
   'hist.sample': '{have} de {need} juegos decididos, el umbral del contrato.',
-  'hist.weekly': 'Log loss por semana · menor es mejor',
+  'hist.weekly': 'Aciertos por semana',
   'hist.nofinals': 'Sin finales',
   'hist.calls': 'Aciertos',
   'hist.calls.n': '{hits} de {n}',
@@ -323,9 +305,7 @@ export const es = {
     'Según el modelo, esto es un juego parejo. En 10 partidos como este, cada lado gana cerca de 5.',
   'tb.cover.more9': 'Según el modelo, en más de 9 de cada 10 partidos como este, gana {team}.',
   'tb.field': 'Campo de probabilidad. El modelo da a {team} un {pm} por ciento.',
-  'tb.dumbbell':
-    'Semana {n}. Log loss del modelo {mo}. Del mercado {mk}. El mercado queda más bajo, que es mejor.',
-  'tb.dumbbell.none': 'Semana {n}. Sin finales.',
+  'tb.weekhits': 'Semana {n}. {hits} de {decided} aciertos.',
   'tb.widget':
     'Próximo juego: {away} en {home}. El modelo da a {team} {n} de cada 10. Actualizado {dt}. Toca dos veces para abrir el juego.',
   'tb.widget.empty': 'Sin juegos todavía. Toca dos veces para abrir la app.',
@@ -403,17 +383,11 @@ export const es = {
   'how.s5.diag': 'Si fuera exacto',
   'how.s5.cd':
     'Curva de calibración de lo que dijo el modelo frente a lo que ocurrió después, del holdout 2024 a 2025. Diez grupos de juegos, de menor a mayor p, 57 juegos en cada uno, 570 juegos en total. Tira de aciertos, {k} de {n}, en juegos decididos, con un ejemplo de 23 de 29.',
-  'how.s6.title': 'El mercado queda como referencia honesta.',
+  'how.s6.title': 'El método es público.',
   'how.s6.p1':
-    'El log loss mide qué tan cerca estuvieron las probabilidades de lo que ocurrió. Más bajo es mejor.',
-  'how.s6.p2':
-    'En el holdout de 2024 a 2025, {n} juegos, el mercado tiene menor log loss que el modelo, {market} contra {model}. Esto es un experimento abierto, no una recomendación.',
-  'how.s6.p3': 'Las barras comparten una escala de 0 a 1. Ninguna se colorea como ganadora.',
-  'how.s6.model': 'Modelo',
-  'how.s6.market': 'Mercado',
-  'how.s6.lower': 'Más bajo es mejor',
+    'El método, los datos y el código son públicos. Esto es un experimento abierto, no una recomendación.',
   'how.s6.cd':
-    'Comparación de log loss en el holdout 2024 a 2025, 570 juegos. Modelo {model}. Mercado {market}. Más bajo es mejor. El mercado queda más bajo. Una fila secundaria de la temporada 2026 hasta hoy, muestra pequeña, con {model_ll} y {market_ll}. Un enlace a la model card.',
+    'El método, los datos y el código son públicos. Esto es un experimento abierto, no una recomendación. Un enlace a la model card.',
   'how.chart.empty': 'Todavía no hay datos para el gráfico.',
   'how.chart.loading': 'Cargando el gráfico.',
   'how.chart.error': 'No se pudo cargar el gráfico.',
@@ -428,7 +402,8 @@ export const es = {
   'how.s2.p_lab': 'p, probabilidad de que gane el local',
   'how.s3.exact':
     'p es la probabilidad de que gane el equipo local. pFav es el mayor entre p y 1-p. n es pFav por 10, con redondeo half up, y se deja entre 5 y 9. Por debajo de 55 por ciento: Juego parejo. Desde 95 por ciento: Más de 9 de cada 10. Nunca dice 10.',
-  'how.s4.foot': 'La compuerta usa log loss. Más bajo es mejor.',
+  'how.s4.foot':
+    'La compuerta usa log loss, una medida de qué tan cerca estuvieron las probabilidades de lo que ocurrió. Más bajo es mejor.',
   'how.s4.metric': 'log loss',
   'how.s4.exact':
     'El mismo modelo, reentrenado, pasa si no empeora más de 0.002. Un modelo distinto tiene que ser estrictamente mejor.',
@@ -438,11 +413,6 @@ export const es = {
   'how.s5.holdout': 'Holdout 2024 a 2025',
   'how.s6.foot':
     'El método es público: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md',
-  'how.s6.market_lower': 'El mercado queda más bajo',
-  'how.s6.holdout': 'Holdout 2024 a 2025',
-  'how.s6.n': '{n} juegos',
-  'how.s6.live': 'Temporada 2026 hasta hoy, muestra pequeña',
-  'how.s6.live_ex': 'Ejemplo  0,559 contra 0,506',
 } as const;
 
 export const stringKeys = [
@@ -481,7 +451,6 @@ export const stringKeys = [
   'detail.countdown.short',
   'detail.countdown.min',
   'detail.footer',
-  'how.honest',
   'how.cover',
   'how.field',
   'detail.how',
@@ -492,7 +461,6 @@ export const stringKeys = [
   'field.home',
   'hist.season',
   'hist.title',
-  'hist.sub',
   'hist.sample',
   'hist.weekly',
   'hist.nofinals',
@@ -542,8 +510,7 @@ export const stringKeys = [
   'tb.cover.tossup',
   'tb.cover.more9',
   'tb.field',
-  'tb.dumbbell',
-  'tb.dumbbell.none',
+  'tb.weekhits',
   'tb.widget',
   'tb.widget.empty',
   'tb.widget.offline',
@@ -605,11 +572,6 @@ export const stringKeys = [
   'how.s5.cd',
   'how.s6.title',
   'how.s6.p1',
-  'how.s6.p2',
-  'how.s6.p3',
-  'how.s6.model',
-  'how.s6.market',
-  'how.s6.lower',
   'how.s6.cd',
   'how.chart.empty',
   'how.chart.loading',
@@ -632,9 +594,4 @@ export const stringKeys = [
   'how.s5.note',
   'how.s5.holdout',
   'how.s6.foot',
-  'how.s6.market_lower',
-  'how.s6.holdout',
-  'how.s6.n',
-  'how.s6.live',
-  'how.s6.live_ex',
 ] as const;

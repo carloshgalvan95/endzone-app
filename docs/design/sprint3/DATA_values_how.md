@@ -2,7 +2,7 @@
 
 Date: 2026-11-19, America/Mexico_City. Author: Idaho (MLOps). Repo: carloshgalvan95/endzone-mlops, branch main, read only through `gh api` and public Pages URLs. App: carloshgalvan95/endzone-app, branch feat/sprint3-redesign. Nothing was cloned, committed or commented.
 
-Honesty line that every value below supports: the market has the lower log loss on every published number. Nothing here is a betting pick.
+The published JSON still carries log loss fields. As of app 0.3.1 the screens do not compare them. Step 6 is the public method and the model card link. Historial shows weekly correct calls. Nothing here is a betting pick.
 
 Confidence scale: high = a file states it verbatim. medium = derived from files with simple arithmetic or a stable reading of code. low = inference, needs Carlos or a warehouse query.
 
@@ -75,6 +75,6 @@ Confidence scale: high = a file states it verbatim. medium = derived from files 
 
 1. Exact `n_games` for prod v2 (about 7,412 by inference). Needs the MLflow run log for `register-h2-full-recent-2026w10-*` or a count on the marts. Not available to me (no Databricks access).
 2. Per season game counts for 1999 to 2015 and 2026 for the timeline callout. Not committed anywhere. Needs a warehouse query. Option: drop per-season counts and show the stated totals (6,991 trained before 2025, 570 held out).
-3. Decision for Carlos or Ixian: step 6 pair. Recommend live 2026 summary from `track_record.json` for the dumbbell (what Historial already shows) plus one line with the 2024 and 2025 holdout pair (0.621 vs 0.598, n 570) as the stable reference.
+3. Step 6 does not show a pair. Historial shows `pick_hits` and `pick_misses` by week. The holdout count `nHoldout` 570 stays on the calibration step.
 4. Decision: whether to show 0.002 on screen. It is the true gate, public in ADR-009 and `walk_forward.md`. Recommend showing it in words ("no more than 0.002 worse"), since the repo is public and the honest-by-default stance is already the product line.
 5. Calibration data source: static labeled illustration or bundled holdout bins (see `{n_bin}` row).

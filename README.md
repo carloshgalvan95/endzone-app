@@ -2,7 +2,7 @@
 
 Android and iOS client for the weekly NFL win probabilities published by [endzone-mlops](https://github.com/carloshgalvan95/endzone-mlops). Android is the first native target. The same Expo project is the iOS client later.
 
-Version 0.3.0. Application id `io.github.carloshgalvan95.endzone`. The app reads site data contract major version 1 and nothing else. It does not ship a model and it is not betting advice.
+Version 0.3.1. Application id `io.github.carloshgalvan95.endzone`. The app reads site data contract major version 1 and nothing else. It does not ship a model and it is not betting advice. It does not show a market comparison.
 
 ## Architecture
 
@@ -32,12 +32,11 @@ A missing `contract_version` means major 1, because files published before the f
 
 ## Screens
 
-1. Weekly slate, the home screen. Season and week, model version, one card per game. Each card shows both teams, the model home win probability, the market probability and the difference, the estimated margin and total, and the final score when the game is final. An example slate (`sample: true`) shows an example banner. Loading, empty, error, offline-stale, and contract-update states are all on this screen.
-2. Week picker. The list is `weeks_available` from the open slate.
-3. About. The market has the lower log loss. This is not a recommendation. Links to the model card, the repository, and the site.
-4. Record. Per week and season to date correct picks, plus model and market log loss. A small sample is labeled as one. The sentence follows the published numbers. On the current file the market has the lower log loss.
-5. Game detail. Tap a game. It shows the model home probability, the market comparison when the file has one, kickoff in the phone's local time, and the result when the game is final.
-6. Alerts. A Tuesday local notification, off until you turn it on. It stays on the phone. There is no push server.
+1. Week, the home screen. Season and week, one card per game. Each card shows both teams, the model favorite in tens, and the final score when the game is final. Loading, empty, error, offline, and contract-update states are on this screen.
+2. Historial. Season correct calls, then one row per week from `pick_hits` and `pick_misses`. It does not compare log loss.
+3. How it is calculated. Six steps. Step 6 says the method is public and links to the model card. It does not print a comparison.
+4. Game detail. Tap a game. It shows the model favorite, kickoff in the phone's local time, and the result when the game is final.
+5. Alerts. A Tuesday local notification, off until you turn it on. It stays on the phone. There is no push server.
 
 ## Widget and logos
 
@@ -88,7 +87,7 @@ Colors, type, and spacing follow the site tokens (cream, black, blue, crimson, y
 
 ## Release
 
-Semantic versions. The app version in `package.json` and `app.json` is `0.3.0`, and `android.versionCode` is `3`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
+Semantic versions. The app version in `package.json` and `app.json` is `0.3.1`, and `android.versionCode` is `4`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
 
 ## License
 

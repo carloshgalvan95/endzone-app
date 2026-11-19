@@ -34,7 +34,6 @@ detail.countdown,Starts in {d} d {h} h,Empieza en {d} d {h} h,,"d, h integers"
 detail.countdown.short,Starts in {h} h {m} m,Empieza en {h} h {m} min,32,Use when d = 0 and h >= 1
 detail.countdown.min,Starts in {m} min,Empieza en {m} min,24,Use when under 1 hour
 detail.footer,Open ML experiment. Not a recommendation.,Experimento abierto de ML. Esto no es una recomendación.,,
-how.honest,In 2026 the market has a lower log loss than the model. This is not a recommendation.,En 2026 el mercado tiene menor log loss que el modelo. Esto no es una recomendación.,,History and How it is calculated only
 how.cover,"The cover figure names the model favorite. pFav = max(p, 1-p). n is 5 to 9. Below 55 percent: Toss-up. From 95 percent: More than 9 in 10.","La cifra de portada nombra al favorito del modelo. pFav = max(p, 1-p). n va de 5 a 9. Por debajo de 55 por ciento: Juego parejo. Desde 95 por ciento: Más de 9 de cada 10.",,
 how.field,"The field shows only the model. The ring sits at x = 30 + 3p, with p for the home team. The label is the named favorite's probability.","El campo muestra solo el modelo. El anillo se coloca en x = 30 + 3p, con p del equipo local. La etiqueta es la probabilidad del favorito nombrado.",,
 detail.how,How it is calculated,Cómo se calcula,,
@@ -44,10 +43,9 @@ detail.compact,{away} at {home},{away} en {home},,first word of each name
 field.visitor,Visitor,Visitante,,
 field.home,Home,Local,,
 hist.season,Season {y},Temporada {y},,
-hist.title,The market is better calibrated.,El mercado está mejor calibrado.,,
-hist.sub,Its log loss is lower. Lower is better.,Su log loss es más bajo. Más bajo es mejor.,,
+hist.title,Correct calls this season.,Aciertos de esta temporada.,27,Season heading. No market claim.
 hist.sample,"{have} of {need} decided games, the contract threshold.","{have} de {need} juegos decididos, el umbral del contrato.",,example 29 of 48
-hist.weekly,Log loss by week · lower is better,Log loss por semana · menor es mejor,,
+hist.weekly,Correct calls by week,Aciertos por semana,21,Weekly strip of pick_hits and pick_misses.
 hist.nofinals,No finals,Sin finales,,
 hist.calls,Correct calls,Aciertos,,
 hist.calls.n,{hits} of {n},{hits} de {n},,example 23 of 29
@@ -95,8 +93,7 @@ tb.cover,"According to the model, in 10 games like this, {team} win {n}.","Segú
 tb.cover.tossup,"According to the model, this is a toss-up. In 10 games like this, each side wins about 5.","Según el modelo, esto es un juego parejo. En 10 partidos como este, cada lado gana cerca de 5.",,
 tb.cover.more9,"According to the model, in more than 9 of 10 games like this, {team} win.","Según el modelo, en más de 9 de cada 10 partidos como este, gana {team}.",,
 tb.field,Probability field. The model gives {team} {pm} percent.,Campo de probabilidad. El modelo da a {team} un {pm} por ciento.,,"named favorite, pm is pFav*100"
-tb.dumbbell,"Week {n}. Model log loss {mo}. Market log loss {mk}. The market is lower, which is better.","Semana {n}. Log loss del modelo {mo}. Del mercado {mk}. El mercado queda más bajo, que es mejor.",,"mo, mk at 3 decimals, locale format"
-tb.dumbbell.none,Week {n}. No finals.,Semana {n}. Sin finales.,,
+tb.weekhits,Week {n}. {hits} of {decided} correct calls.,Semana {n}. {hits} de {decided} aciertos.,44,Spoken label for one week of correct calls. Empty weeks use hist.nofinals.
 tb.widget,Next game: {away} at {home}. The model gives {team} {n} in 10. Updated {dt}. Double tap to open the game.,Próximo juego: {away} en {home}. El modelo da a {team} {n} de cada 10. Actualizado {dt}. Toca dos veces para abrir el juego.,,
 tb.widget.empty,No games yet. Double tap to open the app.,Sin juegos todavía. Toca dos veces para abrir la app.,,
 tb.widget.offline,Offline. Showing data updated {dt}. Double tap to open the app.,Sin conexión. Mostrando datos actualizados {dt}. Toca dos veces para abrir la app.,,
@@ -156,14 +153,9 @@ how.s5.obs,What happened,Lo que ocurrió,14,
 how.s5.calls,Correct calls {k} of {n},Aciertos {k} de {n},24,Live binding from track_record.json. Boards show a labeled example; do not hardcode.
 how.s5.diag,If it were exact,Si fuera exacto,16,
 how.s5.cd,"A calibration curve of what the model said versus what later happened, from the holdout 2024 to 2025. Ten groups of games, from lowest to highest p, 57 games in each, 570 games in all. A weekly strip of correct calls, {k} of {n}, on decided games, with an example of 23 of 29.","Curva de calibración de lo que dijo el modelo frente a lo que ocurrió después, del holdout 2024 a 2025. Diez grupos de juegos, de menor a mayor p, 57 juegos en cada uno, 570 juegos en total. Tira de aciertos, {k} de {n}, en juegos decididos, con un ejemplo de 23 de 29.",276,Live binding from track_record.json. Boards show a labeled example; do not hardcode.
-how.s6.title,The market stays as an honest reference.,El mercado queda como referencia honesta.,41,
-how.s6.p1,Log loss is a score for how close the probabilities were to what happened. Lower is better.,El log loss mide qué tan cerca estuvieron las probabilidades de lo que ocurrió. Más bajo es mejor.,98,
-how.s6.p2,"On the holdout from 2024 to 2025, 570 games, the market has a lower log loss than the model, 0.598 against 0.621. This is an open experiment, not a recommendation.","En el holdout de 2024 a 2025, 570 juegos, el mercado tiene menor log loss que el modelo, 0,598 contra 0,621. Esto es un experimento abierto, no una recomendación.",163,Frozen holdout 2024 to 2025 from DATA_values.md / holdout_2024_2025.json.
-how.s6.p3,The bars share a scale from 0 to 1. Neither bar is colored as a winner.,Las barras comparten una escala de 0 a 1. Ninguna se colorea como ganadora.,75,
-how.s6.model,Model,Modelo,6,
-how.s6.market,Market,Mercado,7,
-how.s6.lower,Lower is better,Más bajo es mejor,17,
-how.s6.cd,"A log loss comparison on the holdout 2024 to 2025, 570 games. Model 0.621. Market 0.598. Lower is better. The market is lower. A secondary 2026 season to date row, small sample, with {model_ll} and {market_ll}, and an example of 0.559 vs 0.506. A link to the model card.","Comparación de log loss en el holdout 2024 a 2025, 570 juegos. Modelo 0,621. Mercado 0,598. Más bajo es mejor. El mercado queda más bajo. Una fila secundaria de la temporada 2026 hasta hoy, muestra pequeña, con {model_ll} y {market_ll}, y un ejemplo de 0,559 contra 0,506. Un enlace a la model card.",299,Live binding from track_record.json. Boards show a labeled example; do not hardcode.
+how.s6.title,The method is public.,El método es público.,21,Step 6 title. No market comparison.
+how.s6.p1,"The method, the data and the code are public. This is an open experiment, not a recommendation.","El método, los datos y el código son públicos. Esto es un experimento abierto, no una recomendación.",100,Step 6 body.
+how.s6.cd,"The method, the data and the code are public. This is an open experiment, not a recommendation. A link to the model card.","El método, los datos y el código son públicos. Esto es un experimento abierto, no una recomendación. Un enlace a la model card.",127,Step 6 spoken description. Link stays how.s6.foot.
 how.chart.empty,No chart data yet.,Todavía no hay datos para el gráfico.,37,
 how.chart.loading,Loading the chart.,Cargando el gráfico.,20,
 how.chart.error,The chart could not be loaded.,No se pudo cargar el gráfico.,30,
@@ -177,7 +169,7 @@ how.s1.plays,Plays,Jugadas,7,
 how.s1.partial,partial,parcial,7,
 how.s2.p_lab,"p, home win probability","p, probabilidad de que gane el local",36,
 how.s3.exact,"p is the probability that the home team wins. pFav is the larger of p and 1-p. n is pFav times 10, rounded half up, then kept between 5 and 9. Below 55 percent: Toss-up. From 95 percent: More than 9 in 10. It never says 10.","p es la probabilidad de que gane el equipo local. pFav es el mayor entre p y 1-p. n es pFav por 10, con redondeo half up, y se deja entre 5 y 9. Por debajo de 55 por ciento: Juego parejo. Desde 95 por ciento: Más de 9 de cada 10. Nunca dice 10.",244,
-how.s4.foot,The gate uses log loss. Lower is better.,La compuerta usa log loss. Más bajo es mejor.,45,
+how.s4.foot,"The gate uses log loss, a score for how close the probabilities were to what happened. Lower is better.","La compuerta usa log loss, una medida de qué tan cerca estuvieron las probabilidades de lo que ocurrió. Más bajo es mejor.",122,Absorbs the log loss definition that used to live only in step 6.
 how.s4.metric,log loss,log loss,8,
 how.s4.exact,"The same model, retrained, passes if it is no more than 0.002 worse. A different model has to be strictly better.","El mismo modelo, reentrenado, pasa si no empeora más de 0.002. Un modelo distinto tiene que ser estrictamente mejor.",116,Foldable only. 0.002 is the refresh margin. Do not show 0.003. Do not put a threshold on the main screen.
 how.s5.foot,"Correct calls {k} of {n}, on decided games.","Aciertos {k} de {n}, en juegos decididos.",43,Live binding from track_record.json. Boards show a labeled example; do not hardcode.
@@ -185,8 +177,3 @@ how.s5.calls_ex,Example  23 of 29,Ejemplo  23 de 29,17,"Labeled example from tra
 how.s5.note,"When we say 7 in 10, it should happen about 7 times in 10.","Cuando decimos 7 de 10, debería ocurrir cerca de 7 veces en 10.",63,
 how.s5.holdout,Holdout 2024 to 2025,Holdout 2024 a 2025,20,Frozen holdout 2024 to 2025 from DATA_values.md / holdout_2024_2025.json.
 how.s6.foot,The method is public: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md,El método es público: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md,99,
-how.s6.market_lower,The market is lower,El mercado queda más bajo,25,
-how.s6.holdout,Holdout 2024 to 2025,Holdout 2024 a 2025,20,Frozen holdout 2024 to 2025 from DATA_values.md / holdout_2024_2025.json.
-how.s6.n,570 games,570 juegos,10,Frozen holdout 2024 to 2025 from DATA_values.md / holdout_2024_2025.json.
-how.s6.live,"2026 season to date, small sample","Temporada 2026 hasta hoy, muestra pequeña",41,
-how.s6.live_ex,Example  0.559 vs 0.506,"Ejemplo  0,559 contra 0,506",27,"Labeled example from track_record.json on 19 nov 2026, America/Mexico_City. Not a live binding."
