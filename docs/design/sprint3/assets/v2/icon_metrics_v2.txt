@@ -1,0 +1,68 @@
+logo_v4 adaptive icon metrics v2
+Entire foreground fits in a 62 dp diameter circle, centered on a 108 dp canvas.
+Previous v1 scaled width to 62 dp; corners reached ~75 dp diameter and left the 66 dp safe circle.
+
+[fg-432]
+  canvas_px: 432
+  canvas_dp: 108
+  ink_box_px: (115, 145, 317, 287)
+  ink_w_px: 202
+  ink_h_px: 142
+  ink_w_dp: 50.5000
+  ink_h_dp: 35.5000
+  ink_center_px: (216.0, 216.0)
+  farthest_r_px: 122.7620
+  farthest_d_dp: 61.3810
+  target_diameter_dp: 62
+  fits_62_circle: True
+  fits_66_circle: True
+  fits_66_square: True
+
+[mono-432]
+  canvas_px: 432
+  canvas_dp: 108
+  ink_box_px: (115, 145, 317, 287)
+  ink_w_px: 202
+  ink_h_px: 142
+  ink_w_dp: 50.5000
+  ink_h_dp: 35.5000
+  ink_center_px: (216.0, 216.0)
+  farthest_r_px: 122.7620
+  farthest_d_dp: 61.3810
+  target_diameter_dp: 62
+  fits_62_circle: True
+  fits_66_circle: True
+  fits_66_square: True
+
+[fg-1024]
+  canvas_px: 1024
+  canvas_dp: 108
+  ink_box_px: (271, 343, 752, 681)
+  ink_w_px: 481
+  ink_h_px: 338
+  ink_w_dp: 50.7305
+  ink_h_dp: 35.6484
+  ink_center_px: (511.5, 512.0)
+  farthest_r_px: 293.6537
+  farthest_d_dp: 61.9426
+  target_diameter_dp: 62
+  fits_62_circle: True
+  fits_66_circle: True
+  fits_66_square: True
+
+[mono-1024]
+  canvas_px: 1024
+  canvas_dp: 108
+  ink_box_px: (271, 343, 752, 681)
+  ink_w_px: 481
+  ink_h_px: 338
+  ink_w_dp: 50.7305
+  ink_h_dp: 35.6484
+  ink_center_px: (511.5, 512.0)
+  farthest_r_px: 293.6537
+  farthest_d_dp: 61.9426
+  target_diameter_dp: 62
+  fits_62_circle: True
+  fits_66_circle: True
+  fits_66_square: True
+
