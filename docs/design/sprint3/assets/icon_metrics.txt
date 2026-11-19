@@ -1,0 +1,69 @@
+logo_v4 adaptive icon metrics
+optical target 62 dp on 108 dp canvas
+
+[fg-432]
+  canvas_px: 432
+  ink_box: (92, 129, 340, 303)
+  ink_w_px: 248
+  ink_h_px: 174
+  optical_dp: 62.0
+  optical_h_dp: 43.5
+  side_margin_px: 92
+  side_margin_frac: 0.21296296296296297
+  safe_square_inset_frac: 0.19444444444444445
+  farthest_r_px: 150.7796405354516
+  farthest_d_dp: 75.3898202677258
+  fits_66_square: True
+  fits_66_circle: False
+
+[mono-432]
+  canvas_px: 432
+  ink_box: (92, 129, 340, 303)
+  ink_w_px: 248
+  ink_h_px: 174
+  optical_dp: 62.0
+  optical_h_dp: 43.5
+  side_margin_px: 92
+  side_margin_frac: 0.21296296296296297
+  safe_square_inset_frac: 0.19444444444444445
+  farthest_r_px: 150.7796405354516
+  farthest_d_dp: 75.3898202677258
+  fits_66_square: True
+  fits_66_circle: False
+
+[fg-1024]
+  canvas_px: 1024
+  ink_box: (218, 305, 806, 718)
+  ink_w_px: 588
+  ink_h_px: 413
+  optical_dp: 62.015625
+  optical_h_dp: 43.55859375
+  side_margin_px: 218
+  side_margin_frac: 0.212890625
+  safe_square_inset_frac: 0.19444444444444445
+  farthest_r_px: 358.86557371807066
+  farthest_d_dp: 75.69820695615553
+  fits_66_square: True
+  fits_66_circle: False
+
+[mono-1024]
+  canvas_px: 1024
+  ink_box: (218, 305, 806, 718)
+  ink_w_px: 588
+  ink_h_px: 413
+  optical_dp: 62.015625
+  optical_h_dp: 43.55859375
+  side_margin_px: 218
+  side_margin_frac: 0.212890625
+  safe_square_inset_frac: 0.19444444444444445
+  farthest_r_px: 358.86557371807066
+  farthest_d_dp: 75.69820695615553
+  fits_66_square: True
+  fits_66_circle: False
+
+[splash]
+  canvas_px: 1024
+  lockup_px: (737, 172)
+  lockup_width_frac: 0.7197265625
+  recommended_imageWidth: 240
+
