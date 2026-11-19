@@ -11,15 +11,9 @@ import type { H2Palette } from '@/theme/ThemeProvider';
 import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { TopBar } from './Chrome';
+import { OpenOutIcon } from './NavIcons';
 import { ModelStrip } from './FieldStrip';
-import {
-  formatCount,
-  formatLivePair,
-  formatLoss,
-  howLiveBindings,
-  linkBreaks,
-  selectHowSummary,
-} from './howBindings';
+import { formatCount, howLiveBindings, selectHowSummary } from './howBindings';
 
 const YEARS = [1999, 2016, 2024, 2026] as const;
 
@@ -35,10 +29,7 @@ export function HowScreen() {
   const season = record.data?.available ? record.data.seasons[0] : undefined;
   const summary = selectHowSummary(season?.summary ?? null, params.fixture === 'track');
   const live = howLiveBindings(summary);
-  const foot = t('how.s6.foot');
-  const urlAt = foot.indexOf('https://');
-  const footLead = urlAt >= 0 ? foot.slice(0, urlAt) : foot;
-  const footUrl = urlAt >= 0 ? foot.slice(urlAt) : '';
+  const methodUrl = record.data?.method_url ?? '';
 
   return (
     <View style={[styles.screen, { backgroundColor: palette.bg }]}>
@@ -112,7 +103,7 @@ export function HowScreen() {
 
         <Step index={4} n="05" title={t('how.s5.title')} palette={palette}>
           <Body palette={palette}>{t('how.s5.p1')}</Body>
-          <Body palette={palette}>{t('how.s5.p2', { n: howCalibration.nHoldout })}</Body>
+          <Body palette={palette}>{t('how.s5.p2')}</Body>
           <Text style={[styles.stamp, { color: palette.textMuted, marginTop: 24 }]}>
             {t('how.s5.holdout')}
           </Text>
@@ -129,38 +120,18 @@ export function HowScreen() {
 
         <Step index={5} n="06" title={t('how.s6.title')} palette={palette}>
           <Body palette={palette}>{t('how.s6.p1')}</Body>
-          <Body palette={palette}>
-            {t('how.s6.p2', {
-              n: howCalibration.nHoldout,
-              market: formatLoss(howCalibration.holdoutMarket, numberLocale),
-              model: formatLoss(howCalibration.holdoutModel, numberLocale),
-            })}
-          </Body>
-          <Body palette={palette}>{t('how.s6.p3')}</Body>
-          <Honesty
-            label={t('how.s6.holdout')}
-            model={howCalibration.holdoutModel}
-            market={howCalibration.holdoutMarket}
-            locale={numberLocale}
-            palette={palette}
-          />
-          <Text style={[styles.foot, { color: palette.textMuted }]}>
-            {t('how.s6.n', { n: howCalibration.nHoldout })}
-          </Text>
-          {live?.marketLower ? (
-            <Text style={[styles.foot, { color: palette.text }]}>{t('how.s6.market_lower')}</Text>
-          ) : null}
-          <Text style={[styles.small, { color: palette.textMuted }]}>{t('how.s6.live')}</Text>
-          <Text style={[styles.small, { color: palette.textMuted }]}>
-            {live?.modelLl != null && live.marketLl != null
-              ? formatLivePair(live.modelLl, live.marketLl, numberLocale)
-              : t('how.chart.empty')}
-          </Text>
-          <Pressable accessibilityRole="link" onPress={() => Linking.openURL(footUrl || '')}>
-            <Text style={[styles.link, { color: palette.text }]}>
-              {footLead}
-              {linkBreaks(footUrl)}
-            </Text>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={t('how.s6.cd')}
+            onPress={() => {
+              if (methodUrl) {
+                Linking.openURL(methodUrl).catch(() => undefined);
+              }
+            }}
+            style={styles.linkRow}
+          >
+            <Text style={[styles.link, { color: palette.modelLabel }]}>{t('how.s6.link')}</Text>
+            <OpenOutIcon color={palette.modelLabel} />
           </Pressable>
         </Step>
       </ScrollView>
@@ -672,61 +643,6 @@ function CalibrationPlot({
   );
 }
 
-function Honesty({
-  label,
-  model,
-  market,
-  locale,
-  palette,
-}: {
-  label: string;
-  model: number;
-  market: number;
-  locale: string;
-  palette: H2Palette;
-}) {
-  const { t } = useI18n();
-  return (
-    <View style={{ marginTop: 12, gap: 8 }}>
-      <Text style={[styles.foot, { color: palette.textMuted }]}>{label}</Text>
-      <Bar name={t('how.s6.model')} value={model} locale={locale} palette={palette} />
-      <Bar name={t('how.s6.market')} value={market} locale={locale} palette={palette} />
-    </View>
-  );
-}
-
-function Bar({
-  name,
-  value,
-  locale,
-  palette,
-}: {
-  name: string;
-  value: number;
-  locale: string;
-  palette: H2Palette;
-}) {
-  return (
-    <View>
-      <Text style={[styles.foot, { color: palette.text }]}>
-        {name}{' '}
-        {new Intl.NumberFormat(locale, {
-          minimumFractionDigits: 3,
-          maximumFractionDigits: 3,
-        }).format(value)}
-      </Text>
-      <View style={[styles.track, { backgroundColor: palette.surfaceRaised }]}>
-        <View
-          style={[
-            styles.fill,
-            { width: `${Math.min(100, value * 100)}%`, backgroundColor: palette.text },
-          ]}
-        />
-      </View>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   list: { flex: 1 },
@@ -738,7 +654,6 @@ const styles = StyleSheet.create({
   stepTitle: { fontFamily: font.sansBold, fontSize: 28, lineHeight: 36, marginTop: 8 },
   body: { fontFamily: font.sans, fontSize: 16, lineHeight: 24, marginTop: 12 },
   foot: { fontFamily: font.sans, fontSize: 14, lineHeight: 20, marginTop: 8 },
-  small: { fontFamily: font.sans, fontSize: 14, lineHeight: 20, marginTop: 4 },
   stamp: {
     fontFamily: font.monoMedium,
     fontSize: 12,
@@ -862,7 +777,17 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  link: { fontFamily: font.sansMedium, fontSize: 14, lineHeight: 20, marginTop: 16 },
-  track: { height: 8, borderRadius: 4, overflow: 'hidden', marginTop: 4 },
-  fill: { height: 8 },
+  linkRow: {
+    minHeight: 48,
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  link: {
+    fontFamily: font.sans,
+    fontSize: 16,
+    lineHeight: 24,
+    textDecorationLine: 'underline',
+  },
 });

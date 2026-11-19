@@ -21,7 +21,7 @@ export const TUESDAY_MINUTE = 0;
 
 export const TUESDAY_ALERT_TITLE = 'The new week is likely up';
 export const TUESDAY_ALERT_BODY =
-  'Open endzone to read this week. The model is compared with the market. This is not a recommendation.';
+  'Open endzone to read this week. This is an open experiment, not a recommendation.';
 
 export function tuesdayTrigger(): WeeklyTriggerInput {
   return {

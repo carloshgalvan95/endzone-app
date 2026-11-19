@@ -44,8 +44,6 @@ function RootStack() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="week" />
-        <Stack.Screen name="about" />
         <Stack.Screen name="record" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="how" />

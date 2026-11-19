@@ -2,7 +2,7 @@
 
 Date: 19 nov 2026, America/Mexico_City. Build r4. Folder: `sprint3/hybrid/H3_how/`. H3 v1 is archived in `H3_how/v1/`.
 
-A six-step scrollytelling screen in the dark kit. Copy is plain language for a curious fan, not a spec. Values on this screen come from `DATA_values.md` (Idaho, 19 nov 2026). Nothing else was invented. Live bindings stay as visible `{k}`, `{n}`, `{model_ll}`, and `{market_ll}` chips, with a labeled example beside them.
+A six-step scrollytelling screen in the dark kit. Copy is plain language for a curious fan, not a spec. Values on this screen come from `DATA_values.md` (Idaho, 19 nov 2026). Nothing else was invented. Live bindings stay as visible `{k}` and `{n}` for correct calls. The app does not show a market comparison.
 
 English is the default locale. Spanish is written to sound natural, not like a translation. No betting language, no em dash, no en dash, no real team logos (Hawks / Stars only). Crimson is used only on the field end zones. The model ring stays blue. The field mid line uses the r4 yellow `#EDB01A`, same as the cover field.
 
@@ -43,11 +43,9 @@ The curve compares what the model said with what later happened, in ten groups o
 
 Correct calls are `{k}` of `{n}` on decided games, bound from `track_record.json` as `pick_hits` and `pick_hits + pick_misses`. The boards show a labeled example, 23 of 29, with an honest proportion bar (not a made-up game-by-game pattern).
 
-### 06. The market stays as an honest reference. / El mercado queda como referencia honesta.
+### 06. The method is public. / El método es público.
 
-Log loss is a score for how close the probabilities were to what happened. Lower is better. On the holdout from 2024 to 2025, 570 games, the market has a lower log loss than the model, 0.598 against 0.621 (0,598 contra 0,621 in Spanish). This is an open experiment, not a recommendation. The bars share a 0 to 1 scale. Neither bar is colored as a winner. The small visual difference is honest.
-
-A secondary row, 2026 season to date, is labeled as a small sample. The app binds `{model_ll}` and `{market_ll}`. The boards show a labeled example, 0.559 vs 0.506 (0,559 contra 0,506). Those live figures mix model versions and rest on 29 games; they are not the primary claim.
+The method, the data and the code are public. This is an open experiment, not a recommendation. The screen links to the model card. It does not draw a comparison and it does not print a log loss pair. Log loss is explained earlier, under the train and test gate.
 
 The method is public: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md
 
@@ -75,9 +73,9 @@ Input: none. Nodes: train, test, manual refresh, gate (log loss, no number), Acc
 
 Input (bundled, frozen): ten pairs `{ pred, obs }`, `nBin` 57, `nHoldout` 570, label Holdout 2024 to 2025. Axes 0 to 1, dashed diagonal, model points 8 dp. Annotation `how.s5.note`. Not a live report. Empty/loading/error if the bundle is missing. Calls foot: `{k}` of `{n}`. Example bar: 23 of 29, labeled.
 
-### Honesty bars (`chart.how.compare`, 358 x 268)
+### Step 6 has no comparison chart
 
-Input, primary (frozen): `{ model: 0.621, market: 0.598, n: 570, label: "Holdout 2024 to 2025" }`. Scale 0 to 1, same cream fill, no winner color. Input, secondary (live): `{ model_ll, market_ll, sample: "small" }` from `track_record.json`. If market is not lower, the app already switches wording (`logLossComparison`); keep the sentence conditional in product code. Locale: 3 decimals, comma in Spanish.
+The step is copy plus the model card link. `holdoutModel` and `holdoutMarket` are not bundled for the screen. `nHoldout` 570 stays on the calibration step. The JSON contract may still carry log loss fields. The app does not render them.
 
 ## Motion
 
@@ -103,16 +101,15 @@ Values and sources are from `DATA_values.md`, 19 nov 2026, America/Mexico_City. 
 | `{feature_4}` | days of rest / los días de descanso | `pregame.py` `home_rest_days`, `away_rest_days` | high | In `how.s2.p2`. |
 | Home advantage | learned from past games, not a named signal / se aprende de juegos pasados; no es una señal con nombre | `endzone/modeling/models.py`, `docs/model_card.md` line 17 | medium | The pill is a concept, not a feature name. Not Elo, no margin of victory. |
 | `{p}` | probability that the home team wins / probabilidad de que gane el equipo local | `model_home_wp`, `coverFromHomeProb` | high | Labeled on the field. No live game value is drawn. |
-| `{metric}` | log loss / log loss | `docs/model_card.md` line 43, `registry.py` `walk_forward_promotion_gate` | high | English term in both locales, first explained in step 6. |
+| `{metric}` | log loss / log loss | `docs/model_card.md` line 43, `registry.py` `walk_forward_promotion_gate` | high | English term in both locales, explained on the train and test step. |
 | `{gate_rule}` on the main screen | only if it is no worse than the current one, within a tiny margin / solo se publica si no queda peor que el anterior, salvo por un margen mínimo | `registry.py` `REFRESH_LOG_LOSS_MARGIN = 0.002`, ADR-009 | high | No number on the main screen. Refresh is manual, not weekly. |
 | `{gate_rule}` in the fold | The same model, retrained, passes if it is no more than 0.002 worse. A different model has to be strictly better. / El mismo modelo, reentrenado, pasa si no empeora más de 0.002. Un modelo distinto tiene que ser estrictamente mejor. | same, `walk_forward_promotion_gate` | high | Foldable only. Do not mention 0.003. |
 | `{n_bin}` | 57 games per group / 57 juegos por grupo | `evaluation.py` `N_CALIBRATION_BINS = 10`, `holdout_2024_2025.json` `bins[].n` | high | "Ten groups of games", never "bin by bin". |
 | Calibration points | pred 0.277, 0.376, 0.435, 0.485, 0.536, 0.587, 0.638, 0.687, 0.752, 0.836; obs 0.298, 0.246, 0.474, 0.386, 0.456, 0.614, 0.649, 0.667, 0.719, 0.895 | `holdout_2024_2025.json` `calibration[]`, `h2_full` pooled, ECE 0.0520 | high | Drawn on the chart, labeled Holdout 2024 to 2025. Not a live report. ECE is not printed. |
 | `{k}` | `{k}` chip, example 23 | `track_record.json` `summary.pick_hits`, generated 2026-11-19T01:35:47Z (18 nov 2026, 19:35 America/Mexico_City) | high | Live binding. 23 is a labeled example only. |
 | `{n}` | `{n}` chip, example 29 | `pick_hits + pick_misses` (app `HistoryScreen.tsx`), live 23 + 6 | high | Decided games only. 29 is a labeled example only. |
-| Holdout `{model_ll}` / `{market_ll}` | 0.621 against 0.598 / 0,621 contra 0,598, n 570 | `holdout_2024_2025.json` `pooled.rows` (0.6207 and 0.5976), `docs/model_card.md` line 127 | high | Primary claim of step 6. Displayed at 3 decimals. |
-| Live 2026 `{model_ll}` / `{market_ll}` | `{model_ll}` vs `{market_ll}`, example 0.559 vs 0.506, small sample | `track_record.json` `model_log_loss` 0.559299, `market_log_loss` 0.506379, `sample_label` small, 29 games | high | Secondary row only. Keep the sentence conditional in the app. |
-| `{season}` | 2026 on the secondary row, as "2026 season to date" | `track_record.json` `seasons[0].season` | high | Not the primary pair. |
+| Holdout log loss pair | not shown | `holdout_2024_2025.json` still publishes the pair | high | Step 6 no longer prints it. Calibration keeps `nHoldout` 570. |
+| Live 2026 log loss pair | not shown | `track_record.json` still publishes the fields | high | Historial shows weekly correct calls (`pick_hits` and `pick_misses`), not a log loss comparison. |
 | `{repo_link}` | https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md | the file on `main` | high | Substituted in the foot. Wrap at slashes. |
 
 ## Editorial decisions
@@ -122,9 +119,9 @@ Values and sources are from `DATA_values.md`, 19 nov 2026, America/Mexico_City. 
 - Timeline mid ticks are 2016 and 2024 because those seasons have a published role (CV start, holdout start). They are labels, not a claim that those years are special in the training set.
 - EPA is explained in plain language as play-by-play form, not as an acronym in the body.
 - The 0.002 margin is told only in the fold, following the brief that no threshold should appear on the main screen.
-- The primary honesty pair is the holdout of 570 games, not the 29-game 2026 sample. The live row is present, labeled small, and bound with chips.
+- Step 6 is the public method and the model card link. It does not compare probabilities.
 - Calibration uses the frozen bins and says so. It does not pretend to be a live report, and it does not say "bin by bin".
-- 23 of 29 and 0.559 vs 0.506 appear only as labeled examples next to the live chips.
+- 23 of 29 appears only as a labeled example next to the live correct-call count.
 - v1 said the model kept "a strength in the family of a rating" and looked at margin. That was wrong for prod `h2_full` and has been removed.
 
 ## Deliverable paths

@@ -221,8 +221,6 @@ export const field = {
   labelSeparateUnder: 18,
   modelRing: 16,
   modelStroke: 3,
-  marketCross: 12,
-  marketStroke: 2,
   x: (pHomePercent: number, width = 360) => {
     const scale = width / 360;
     return (30 + 3 * pHomePercent) * scale;
@@ -363,7 +361,6 @@ export const darkPalette = {
   accent: '#D04A63', // solo tipo grande o wordmark -mlops
   model: '#5A86D6',
   modelLabel: '#8AA6DC',
-  market: '#A9A396',
   accentNav: '#EDB01A', // ONLY for accent.nav roles (r4). Never a model signal.
   accentNavInk: '#151515',
   logoDisc: '#F4EEDF',
@@ -397,7 +394,6 @@ export const lightPalette = {
   accent: '#AE2440',
   model: '#22509B',
   modelLabel: '#22509B',
-  market: '#5E5950',
   accentNav: '#EDB01A', // ONLY for accent.nav roles (r4). Never a model signal.
   accentNavInk: '#151515',
   logoDisc: '#151515',
@@ -426,7 +422,6 @@ export const contrastDark = {
   modelOnSurface: 3.95, // no usar como cuerpo sobre surface
   modelOnPlayField: 4.94, // anillo O
   modelLabelOnPlayField: 7.28,
-  marketOnPlayField: 7.11, // X y etiqueta
   creamOnCrimsonHero: 6.12,
   inkOnCream: 15.78,
   inkOnYellow: 9.41,
@@ -540,9 +535,6 @@ export const chart = {
     flow: { width: 358, height: 424, nodeHeight: 52, radius: 12, gap: 16, gate: 88 },
     // Labeled example from track_record.json on 19 nov 2026. App binds {k} of {n}.
     calls: { exampleK: 23, exampleN: 29 },
-    // Step 6 is an honest 0-1 comparative bar (holdout 2024 to 2025).
-    compare: { width: 358, height: 268, model: 0.621, market: 0.598, n: 570 },
-    dumbbell: { width: 358, height: 168, ring: 18, cross: 16 }, // kept; not used in H3.1
     motion: {
       reveal: 320,
       easing: [0.2, 0, 0, 1] as const,

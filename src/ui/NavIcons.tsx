@@ -43,6 +43,16 @@ export function SettingsIcon({ color, active = false }: IconProps) {
   );
 }
 
+export function OpenOutIcon({ color }: { color: string }) {
+  return (
+    <View style={styles.openBox}>
+      <View style={[styles.openShaft, { backgroundColor: color }]} />
+      <View style={[styles.openHeadH, { backgroundColor: color }]} />
+      <View style={[styles.openHeadV, { backgroundColor: color }]} />
+    </View>
+  );
+}
+
 export function BackIcon({ color }: { color: string }) {
   return (
     <View style={styles.box}>
@@ -76,6 +86,17 @@ const styles = StyleSheet.create({
   bar: { width: 5, borderWidth: 2 },
   tooth: { position: 'absolute', width: 2, height: 22 },
   gearHole: { width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },
+  openBox: { width: 16, height: 16 },
+  openShaft: {
+    position: 'absolute',
+    width: 11,
+    height: 1.5,
+    right: 2,
+    top: 7,
+    transform: [{ rotate: '-45deg' }],
+  },
+  openHeadH: { position: 'absolute', width: 7, height: 1.5, right: 1, top: 2 },
+  openHeadV: { position: 'absolute', width: 1.5, height: 7, right: 1, top: 2 },
   chevron: {
     width: 16,
     height: 16,

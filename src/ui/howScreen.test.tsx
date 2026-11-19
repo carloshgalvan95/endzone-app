@@ -28,8 +28,6 @@ jest.mock('@/data/queries', () => ({
           summary: {
             pick_hits: 11,
             pick_misses: 5,
-            model_log_loss: 0.612,
-            market_log_loss: 0.588,
             sample_label: 'small',
           },
         },
@@ -51,7 +49,6 @@ describe('how screen bindings', () => {
     await waitFor(() => {
       expect(view.getByText('Correct calls 11 of 16')).toBeTruthy();
     });
-    expect(view.getByText('0.612 vs 0.588')).toBeTruthy();
     expect(view.queryByText(/23 of 29/)).toBeNull();
     expect(view.queryByText(/0\.559/)).toBeNull();
     expect(view.queryByText(/0\.506/)).toBeNull();
@@ -60,46 +57,12 @@ describe('how screen bindings', () => {
     expect(source).not.toMatch(/0\.559|0\.506|23 of 29|7,000|0,621|0\.621|0\.598/);
   });
 
-  test('holdout 0.621, 0.598, and 570 come from the bundled file', async () => {
-    const saved = {
-      holdoutModel: howCalibration.holdoutModel,
-      holdoutMarket: howCalibration.holdoutMarket,
-      nHoldout: howCalibration.nHoldout,
-    };
-    await AsyncStorage.setItem('endzone-locale', 'en');
-    const view = await render(
-      <AppThemeProvider mode="light">
-        <LocaleProvider>
-          <HowScreen />
-        </LocaleProvider>
-      </AppThemeProvider>,
-    );
-    try {
-      await waitFor(() => {
-        expect(view.getAllByText(/0\.621/).length).toBeGreaterThan(0);
-      });
-      expect(view.getAllByText(/0\.598/).length).toBeGreaterThan(0);
-      expect(view.getByText('570 games')).toBeTruthy();
-      howCalibration.holdoutModel = 0.412;
-      howCalibration.holdoutMarket = 0.401;
-      howCalibration.nHoldout = 999;
-      view.rerender(
-        <AppThemeProvider mode="light">
-          <LocaleProvider>
-            <HowScreen />
-          </LocaleProvider>
-        </AppThemeProvider>,
-      );
-      await waitFor(() => {
-        expect(view.getAllByText(/0\.412/).length).toBeGreaterThan(0);
-      });
-      expect(view.queryByText(/0\.621/)).toBeNull();
-      expect(view.getAllByText(/0\.401/).length).toBeGreaterThan(0);
-      expect(view.getByText('999 games')).toBeTruthy();
-    } finally {
-      howCalibration.holdoutModel = saved.holdoutModel;
-      howCalibration.holdoutMarket = saved.holdoutMarket;
-      howCalibration.nHoldout = saved.nHoldout;
-    }
+  test('calibration points come from the bundled file, not a market pair', () => {
+    const source = fs.readFileSync(path.join(process.cwd(), 'src/ui/HowScreen.tsx'), 'utf8');
+    expect(source).not.toMatch(/0\.621|0\.598/);
+    expect(howCalibration.pred[0]).toBe(0.277);
+    expect(howCalibration.nHoldout).toBe(570);
+    expect(howCalibration).not.toHaveProperty('holdoutModel');
+    expect(howCalibration).not.toHaveProperty('holdoutMarket');
   });
 });

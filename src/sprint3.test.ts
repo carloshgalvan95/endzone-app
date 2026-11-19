@@ -12,13 +12,8 @@ import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
 import { rowLabelLeft } from '@/ui/FieldStrip';
 import { darkLogoMark, darkLogoRatio, meanOpaqueContrast } from '@/logos/contrast';
-import {
-  formatCount,
-  formatLivePair,
-  formatLoss,
-  howLiveBindings,
-  selectHowSummary,
-} from '@/ui/howBindings';
+import { bestWeek, latestWeek, secondaryWeeks, weeksOnChart } from '@/ui/historyWeeks';
+import { formatCount, formatLoss, howLiveBindings, selectHowSummary } from '@/ui/howBindings';
 import { formatCompactWhen } from '@/ui/weekModel';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
@@ -76,12 +71,16 @@ describe('i18n catalog', () => {
       .slice(1)
       .map((line) => line.split(',')[0] ?? '')
       .filter((key) => key.length > 0);
-    expect(keys.length).toBe(191);
+    expect(keys.length).toBe(185);
     for (const key of keys) {
       expect(en[key as keyof typeof en]?.length).toBeGreaterThan(0);
       expect(es[key as keyof typeof es]?.length).toBeGreaterThan(0);
     }
-    expect(stringKeys).toHaveLength(191);
+    expect(stringKeys).toHaveLength(185);
+    for (const value of [...Object.values(en), ...Object.values(es)]) {
+      const lower = value.toLowerCase();
+      expect(lower.includes('market') || lower.includes('mercado')).toBe(false);
+    }
     expect(resolveLocale('system', 'es-MX')).toBe('es');
     expect(resolveLocale('system', 'en-US')).toBe('en');
     expect(resolveLocale('en', 'es')).toBe('en');
@@ -155,7 +154,7 @@ describe('how copy', () => {
       .slice(1)
       .map((line) => line.split(',')[0] ?? '')
       .filter((key) => key.startsWith('how.'));
-    expect(rows).toHaveLength(80);
+    expect(rows).toHaveLength(69);
     for (const key of rows) {
       const spanish = es[key as keyof typeof es];
       expect(spanish.length).toBeGreaterThan(0);
@@ -172,35 +171,20 @@ describe('how copy', () => {
 });
 
 describe('how live bindings', () => {
-  test('binds hits and keeps the market sentence conditional', () => {
+  test('binds correct calls and ignores extra contract fields', () => {
     const lower = howLiveBindings({
       pick_hits: 23,
       pick_misses: 6,
-      model_log_loss: 0.559,
-      market_log_loss: 0.506,
       sample_label: 'small',
     });
-    expect(lower).toMatchObject({ k: 23, n: 29, marketLower: true, small: true });
-    const higher = howLiveBindings({
-      pick_hits: 10,
-      pick_misses: 2,
-      model_log_loss: 0.4,
-      market_log_loss: 0.5,
-      sample_label: null,
-    });
-    expect(higher?.marketLower).toBe(false);
+    expect(lower).toMatchObject({ k: 23, n: 29, small: true });
     expect(howLiveBindings(null)).toBeNull();
     const sample = howLiveBindings({
-      pick_hits: 8,
-      pick_misses: 3,
-      model_log_loss: 0.612,
-      market_log_loss: 0.588,
+      pick_hits: 11,
+      pick_misses: 5,
       sample_label: 'small',
     });
-    expect(sample?.marketLower).toBe(true);
-    expect(formatLivePair(0.612, 0.588, 'en')).toBe('0.612 vs 0.588');
-    expect(formatLivePair(0.612, 0.588, 'es')).toBe('0,612 contra 0,588');
-    expect(sample).not.toMatchObject({ k: 23, n: 29 });
+    expect(sample).toMatchObject({ k: 11, n: 16, small: true });
   });
 });
 
@@ -233,14 +217,35 @@ describe('logo contrast', () => {
   });
 });
 
+describe('history weeks', () => {
+  const weeks = [
+    { week: 8, state: 'no_finals' as const, pick_hits: 0, pick_misses: 0 },
+    { week: 9, state: 'complete' as const, pick_hits: 14, pick_misses: 1 },
+    { week: 10, state: 'complete' as const, pick_hits: 9, pick_misses: 5 },
+    { week: 11, state: 'no_finals' as const, pick_hits: 0, pick_misses: 0 },
+    { week: 12, state: 'no_finals' as const, pick_hits: 0, pick_misses: 0 },
+  ];
+
+  test('draws from the first final through the current week', () => {
+    expect(weeksOnChart(weeks, 11).map((week) => week.week)).toEqual([9, 10, 11]);
+    expect(weeksOnChart(weeks, 10).map((week) => week.week)).toEqual([9, 10]);
+  });
+
+  test('picks the best week, then the latest, and collapses a single final', () => {
+    expect(bestWeek(weeks)?.week).toBe(9);
+    expect(latestWeek(weeks)?.week).toBe(10);
+    expect(secondaryWeeks(weeks).single).toBe(false);
+    expect(secondaryWeeks(weeks.filter((week) => week.week !== 10)).single).toBe(true);
+    expect(secondaryWeeks(weeks.filter((week) => week.week !== 10)).tiles[0]?.week).toBe(9);
+  });
+});
+
 describe('how fixture gate', () => {
   test('a release build ignores the screenshot fixture', () => {
     expect(selectHowSummary(null, true, false)).toBeNull();
     expect(selectHowSummary(null, true, true)).toMatchObject({
       pick_hits: 11,
       pick_misses: 5,
-      model_log_loss: 0.612,
-      market_log_loss: 0.588,
     });
     expect(formatLoss(0.612, 'es-MX')).toBe('0.612');
     expect(formatCount(7000, 'es-MX')).toBe('7,000');
