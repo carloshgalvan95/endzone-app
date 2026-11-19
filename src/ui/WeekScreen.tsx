@@ -502,9 +502,11 @@ function WeekRow({
           },
         ]}
       >
-        <Text style={[styles.kicker, { color: palette.textMuted, marginBottom: 8 }]}>{kicker}</Text>
         <View style={styles.rowTop}>
           <View style={styles.names}>
+            <Text style={[styles.kicker, { color: palette.textMuted, marginBottom: 8 }]}>
+              {kicker}
+            </Text>
             <View style={styles.nameLine}>
               <TeamSlot
                 name={awayName}
@@ -637,7 +639,6 @@ const styles = StyleSheet.create({
   meta: { fontFamily: font.sans, fontSize: 14, lineHeight: 20, marginTop: 8 },
   saved: { flex: 1, fontFamily: font.sans, fontSize: 12, lineHeight: 16 },
   chip: {
-    alignSelf: 'flex-start',
     borderWidth: 1.5,
     borderRadius: 4,
     paddingHorizontal: 8,
@@ -685,7 +686,8 @@ const styles = StyleSheet.create({
     borderRadius: weekCard.radius,
     padding: weekCard.padding,
   },
-  rowTop: { flexDirection: 'row', gap: 12, alignItems: 'flex-end' },
+  rowTop: { flexDirection: 'row', alignItems: 'stretch' },
+  figure: { alignItems: 'flex-end', maxWidth: 128, justifyContent: 'flex-end' },
   names: { flex: 1, gap: 0 },
   nameLine: { height: 24, flexDirection: 'row', alignItems: 'center', gap: weekCard.logoToName },
   hotDay: {
@@ -697,11 +699,10 @@ const styles = StyleSheet.create({
   },
   team: { fontFamily: font.sansMedium, fontSize: 16, lineHeight: 22 },
   teamFav: { fontFamily: font.sansBold },
-  figure: { alignItems: 'flex-end', maxWidth: 128 },
   figurePhrase: {
     fontFamily: font.sansMedium,
-    fontSize: 13,
-    lineHeight: 16,
+    fontSize: 16,
+    lineHeight: 20,
     textAlign: 'right',
   },
   rowFigure: { fontFamily: font.sansBold, fontSize: 48, lineHeight: 48 },

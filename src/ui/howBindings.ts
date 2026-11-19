@@ -39,3 +39,12 @@ export function formatLoss(value: number, locale: string): string {
     maximumFractionDigits: 3,
   }).format(value);
 }
+
+export function formatLivePair(model: number, market: number, locale: string): string {
+  return `${formatLoss(model, locale)} vs ${formatLoss(market, locale)}`;
+}
+
+/** Break only after a slash. The repo name keeps a non-breaking hyphen. */
+export function linkBreaks(url: string): string {
+  return url.replaceAll('/', '/\u200b').replaceAll('-', '\u2011');
+}

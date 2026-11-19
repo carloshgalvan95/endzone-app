@@ -1,9 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'expo-localization';
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+
+import { hydratePreference } from '@/prefs/hydratePreference';
 
 import { resolveLocale, translate, type AppLocale, type LocalePreference } from './index';
 import { LOCALE_STORAGE_KEY } from './resolve';
+
+const LOCALE_OPTIONS = ['system', 'en', 'es'] as const;
 
 type LocaleValue = {
   locale: AppLocale;
@@ -16,17 +28,25 @@ const LocaleContext = createContext<LocaleValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [preference, setPreferenceState] = useState<LocalePreference>('system');
+  const userChanged = useRef(false);
   const device = getLocales()[0]?.languageCode ?? 'en';
   const locale = resolveLocale(preference, device);
 
   useEffect(() => {
+    let cancelled = false;
     AsyncStorage.getItem(LOCALE_STORAGE_KEY)
       .then((stored) => {
-        if (stored === 'en' || stored === 'es' || stored === 'system') {
-          setPreferenceState(stored);
+        if (cancelled) {
+          return;
         }
+        setPreferenceState((current) =>
+          hydratePreference(stored, current, userChanged.current, LOCALE_OPTIONS),
+        );
       })
       .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const value = useMemo<LocaleValue>(
@@ -34,6 +54,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       locale,
       preference,
       setPreference: (next) => {
+        userChanged.current = true;
         setPreferenceState(next);
         AsyncStorage.setItem(LOCALE_STORAGE_KEY, next).catch(() => undefined);
       },

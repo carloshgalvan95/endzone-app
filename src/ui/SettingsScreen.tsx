@@ -58,7 +58,7 @@ export function SettingsScreen() {
         }}
       >
         <Text style={[styles.title, { color: palette.text }]}>{t('set.title')}</Text>
-        <Text style={[styles.kicker, { color: palette.textMuted, marginBottom: 8 }]}>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: 16, marginBottom: 8 }]}>
           {t('set.lang')}
         </Text>
         {options.map((option) => {
@@ -188,7 +188,9 @@ export function SettingsScreen() {
           {alertOn ? t('set.on') : t('set.off')}
         </Text>
         {note ? <Text style={[styles.muted, { color: palette.textMuted }]}>{note}</Text> : null}
-        <Text style={[styles.kicker, { color: palette.textMuted }]}>{t('set.version')}</Text>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: 16 }]}>
+          {t('set.version')}
+        </Text>
         <Text style={[styles.body, { color: palette.text }]}>
           {Constants.expoConfig?.version ?? '0.3.0'}
         </Text>

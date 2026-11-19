@@ -6,10 +6,11 @@ import { resolveLocale } from '@/i18n/resolve';
 import { en, es, stringKeys } from '@/i18n/catalog';
 import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { fieldMarkerX, fieldX } from '@/slate/field';
+import { hydratePreference } from '@/prefs/hydratePreference';
 import { countdownCopy, dayBucket, groupByLocalDay } from '@/ui/schedule';
 import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
-import { howLiveBindings } from '@/ui/howBindings';
+import { formatLivePair, howLiveBindings } from '@/ui/howBindings';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
 import { widgetMark } from '@/widget/mark';
@@ -134,6 +135,33 @@ describe('strip lanes and week field', () => {
   });
 });
 
+describe('how copy', () => {
+  test('every how key resolves in Spanish to the catalog, not an English fallback', () => {
+    const csv = fs.readFileSync(
+      path.join(process.cwd(), 'docs/design/sprint3/strings_en_es.csv'),
+      'utf8',
+    );
+    const rows = csv
+      .split('\n')
+      .slice(1)
+      .map((line) => line.split(',')[0] ?? '')
+      .filter((key) => key.startsWith('how.'));
+    expect(rows).toHaveLength(80);
+    for (const key of rows) {
+      const spanish = es[key as keyof typeof es];
+      expect(spanish.length).toBeGreaterThan(0);
+      const vars: Record<string, string> = {};
+      for (const match of spanish.matchAll(/\{(\w+)\}/g)) {
+        const name = match[1] ?? '';
+        vars[name] = `{${name}}`;
+      }
+      expect(translate('es', key, vars)).toBe(spanish);
+    }
+    expect(translate('es', 'how.title')).toBe('Cómo se calcula');
+    expect(translate('es', 'how.s1.title')).not.toBe(en['how.s1.title']);
+  });
+});
+
 describe('how live bindings', () => {
   test('binds hits and keeps the market sentence conditional', () => {
     const lower = howLiveBindings({
@@ -153,6 +181,26 @@ describe('how live bindings', () => {
     });
     expect(higher?.marketLower).toBe(false);
     expect(howLiveBindings(null)).toBeNull();
+    const sample = howLiveBindings({
+      pick_hits: 8,
+      pick_misses: 3,
+      model_log_loss: 0.612,
+      market_log_loss: 0.588,
+      sample_label: 'small',
+    });
+    expect(sample?.marketLower).toBe(true);
+    expect(formatLivePair(0.612, 0.588, 'en')).toBe('0.612 vs 0.588');
+    expect(formatLivePair(0.612, 0.588, 'es')).toBe('0,612 vs 0,588');
+  });
+});
+
+describe('preference hydration', () => {
+  test('keeps a choice made this session when an older stored value arrives later', () => {
+    expect(hydratePreference('dark', 'light', true, ['system', 'light', 'dark'])).toBe('light');
+    expect(hydratePreference('en', 'es', true, ['system', 'en', 'es'])).toBe('es');
+    expect(hydratePreference('dark', 'system', false, ['system', 'light', 'dark'])).toBe('dark');
+    expect(hydratePreference(null, 'system', false, ['system', 'en', 'es'])).toBe('system');
+    expect(hydratePreference('nope', 'system', false, ['system', 'light', 'dark'])).toBe('system');
   });
 });
 

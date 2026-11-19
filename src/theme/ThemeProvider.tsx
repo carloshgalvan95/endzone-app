@@ -1,6 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { AccessibilityInfo, useColorScheme } from 'react-native';
+
+import { hydratePreference } from '@/prefs/hydratePreference';
 
 import { darkPalette, lightPalette, themePref } from './h2';
 import { resolveThemePreference, type ThemePreference } from './resolveTheme';
@@ -28,6 +38,7 @@ export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
   const system = useColorScheme();
   const [preference, setPreferenceState] = useState<ThemePreference>(themePref.default);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const userChanged = useRef(false);
   const systemMode: ThemeMode = system === 'light' ? 'light' : 'dark';
   const resolved: ThemeMode = mode ?? resolveThemePreference(preference, systemMode);
   const theme = useMemo(() => themeFor(resolved), [resolved]);
@@ -37,6 +48,7 @@ export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
       palette: resolved === 'light' ? lightPalette : darkPalette,
       preference,
       setPreference: (next) => {
+        userChanged.current = true;
         setPreferenceState(next);
         AsyncStorage.setItem(themePref.storageKey, next).catch(() => undefined);
       },
@@ -46,11 +58,15 @@ export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
   );
 
   useEffect(() => {
+    let cancelled = false;
     AsyncStorage.getItem(themePref.storageKey)
       .then((stored) => {
-        if (stored === 'system' || stored === 'light' || stored === 'dark') {
-          setPreferenceState(stored);
+        if (cancelled) {
+          return;
         }
+        setPreferenceState((current) =>
+          hydratePreference(stored, current, userChanged.current, themePref.options),
+        );
       })
       .catch(() => undefined);
     const subscription = AccessibilityInfo.addEventListener(
@@ -60,7 +76,10 @@ export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
     AccessibilityInfo.isReduceMotionEnabled()
       .then(setReducedMotion)
       .catch(() => undefined);
-    return () => subscription.remove();
+    return () => {
+      cancelled = true;
+      subscription.remove();
+    };
   }, []);
 
   return (

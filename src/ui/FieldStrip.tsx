@@ -15,6 +15,17 @@ type FieldStripProps = {
 
 const YARDS = [10, 20, 30, 40, 60, 70, 80, 90];
 
+/** 6 dp to the right of the ring, or 6 dp to the left if the label would pass the end zone. */
+export function rowLabelPercent(marker: number, letters: number, width: number): number {
+  const ring = 16;
+  const gap = 6;
+  const end = 6;
+  const label = Math.min(140, Math.max(48, letters * 7));
+  const right = marker + ring / 2 + gap;
+  const x = right + label <= width - end - 4 ? right : marker - ring / 2 - gap - label;
+  return (Math.max(end, x) / width) * 100;
+}
+
 function Midline({ light, color, ink }: { light: boolean; color: string; ink: string }) {
   if (!light) {
     return <View style={[styles.mid, { width: 2, marginLeft: -1, backgroundColor: color }]} />;
@@ -171,8 +182,7 @@ export function FieldStrip({ pHome, height, width, variant, caption, ringLabel }
                 ? {
                     color: palette.modelLabel,
                     top: 4,
-                    left: ringLeft > 50 ? 8 : undefined,
-                    right: ringLeft > 50 ? undefined : 8,
+                    left: `${rowLabelPercent(marker, ringLabel.length, basis)}%`,
                   }
                 : {
                     color: palette.modelLabel,
