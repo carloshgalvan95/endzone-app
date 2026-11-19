@@ -11,6 +11,7 @@ import type { H2Palette } from '@/theme/ThemeProvider';
 import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { TopBar } from './Chrome';
+import { OpenOutIcon } from './NavIcons';
 import { ModelStrip } from './FieldStrip';
 import { formatCount, howLiveBindings, selectHowSummary } from './howBindings';
 
@@ -130,7 +131,7 @@ export function HowScreen() {
             style={styles.linkRow}
           >
             <Text style={[styles.link, { color: palette.modelLabel }]}>{t('how.s6.link')}</Text>
-            <View style={[styles.external, { borderColor: palette.modelLabel }]} />
+            <OpenOutIcon color={palette.modelLabel} />
           </Pressable>
         </Step>
       </ScrollView>
@@ -789,5 +790,4 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textDecorationLine: 'underline',
   },
-  external: { width: 16, height: 16, borderWidth: 1.5, borderRadius: 2 },
 });

@@ -15,6 +15,37 @@ import { decidedCalls, secondaryWeeks, weeksOnChart, type WeekCalls } from './hi
 
 const PLOT = 96;
 
+function recordForFixture(kind: string | undefined): TrackRecordDocument {
+  const base = recordFixture as TrackRecordDocument;
+  if (kind !== 'none') {
+    return base;
+  }
+  return {
+    ...base,
+    available: true,
+    seasons: base.seasons.map((season) => ({
+      ...season,
+      weeks: season.weeks.map((week) => ({
+        ...week,
+        state: 'no_finals' as const,
+        pick_hits: 0,
+        pick_misses: 0,
+        decided: 0,
+        finished: 0,
+      })),
+      summary: {
+        ...season.summary,
+        pick_hits: 0,
+        pick_misses: 0,
+        decided: 0,
+        finished: 0,
+        weeks_with_finals: 0,
+        sample_label: 'no_finals',
+      },
+    })),
+  };
+}
+
 export function HistoryScreen() {
   const { t, numberLocale } = useI18n();
   const { palette, reducedMotion } = useH2Theme();
@@ -24,8 +55,8 @@ export function HistoryScreen() {
   const params = useLocalSearchParams<{ fixture?: string }>();
   const query = useTrackRecord();
   const slate = useSlate({ kind: 'latest' });
-  const fixtureOn = __DEV__ && params.fixture === 'record';
-  const record = fixtureOn ? (recordFixture as TrackRecordDocument) : query.data;
+  const fixtureOn = __DEV__ && (params.fixture === 'record' || params.fixture === 'none');
+  const record = fixtureOn ? recordForFixture(params.fixture) : query.data;
   const fmt = new Intl.NumberFormat(numberLocale);
   const contentW = window.width - 32;
   const stackTiles = PixelRatio.getFontScale() >= 1.3;
@@ -166,15 +197,20 @@ export function HistoryScreen() {
                             <Text style={[styles.kicker, { color: palette.textMuted }]}>
                               {label}
                             </Text>
-                            <Text
-                              allowFontScaling={false}
-                              style={[styles.tileFigure, { color: palette.text, marginTop: 8 }]}
-                            >
-                              {t('hist.calls.n', {
-                                hits: fmt.format(week.pick_hits),
-                                n: fmt.format(weekN),
-                              })}
-                            </Text>
+                            <View style={styles.tileFigures}>
+                              <Text
+                                allowFontScaling={false}
+                                style={[styles.tileFigure, { color: palette.text }]}
+                              >
+                                {fmt.format(week.pick_hits)}
+                              </Text>
+                              <Text
+                                allowFontScaling={false}
+                                style={[styles.tileOf, { color: palette.text }]}
+                              >
+                                {t('hist.hero.of', { n: fmt.format(weekN) })}
+                              </Text>
+                            </View>
                             <Text
                               style={[styles.small, { color: palette.textMuted, marginTop: 4 }]}
                             >
@@ -262,6 +298,8 @@ function WeekChart({
   const barW = Math.min(24, Math.max(8, pitch - 8));
   const maxN = Math.max(8, ...weeks.map((week) => decidedCalls(week)));
   const unit = PLOT / maxN;
+  const blockH = Math.max(2, unit - 2);
+  const missStroke = blockH < 6 ? 1 : 1.5;
   const showNumber = (week: WeekCalls, index: number) =>
     pitch >= 20 || week.week % 2 === 1 || index === weeks.length - 1;
   return (
@@ -273,7 +311,11 @@ function WeekChart({
           const n = decidedCalls(week);
           const empty = week.state === 'no_finals' || n === 0;
           return (
-            <View key={week.week} accessibilityLabel={labelFor(week)} style={{ width: pitch }}>
+            <View
+              key={week.week}
+              accessibilityLabel={labelFor(week)}
+              style={[styles.column, { width: pitch }]}
+            >
               {empty ? null : (
                 <View style={[styles.stack, { width: barW }]}>
                   {Array.from({ length: week.pick_hits }, (_, block) => (
@@ -281,7 +323,7 @@ function WeekChart({
                       key={`h-${block}`}
                       style={{
                         width: barW,
-                        height: Math.max(2, unit - 2),
+                        height: blockH,
                         borderRadius: 2,
                         backgroundColor: model,
                       }}
@@ -292,9 +334,9 @@ function WeekChart({
                       key={`m-${block}`}
                       style={{
                         width: barW,
-                        height: Math.max(2, unit - 2),
+                        height: blockH,
                         borderRadius: 2,
-                        borderWidth: 1.5,
+                        borderWidth: missStroke,
                         borderColor: outline,
                       }}
                     />
@@ -334,14 +376,26 @@ const styles = StyleSheet.create({
   },
   headline: { fontFamily: font.sansBold, fontSize: 32, lineHeight: 36 },
   hero: { borderRadius: radius.hero, padding: 16, minHeight: 168 },
-  heroFigures: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  display: { fontFamily: font.sansBold, fontSize: 96, lineHeight: 96, letterSpacing: -4 },
-  heroOf: { fontFamily: font.sansBold, fontSize: 24, lineHeight: 30, marginBottom: 10 },
+  heroFigures: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  display: {
+    fontFamily: font.sansBold,
+    fontSize: 96,
+    lineHeight: 96,
+    letterSpacing: -4,
+    includeFontPadding: false,
+  },
+  heroOf: {
+    fontFamily: font.sansBold,
+    fontSize: 24,
+    lineHeight: 30,
+    includeFontPadding: false,
+  },
   heroLine: { fontFamily: font.sans, fontSize: 16, lineHeight: 24 },
   small: { fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
   body: { fontFamily: font.sans, fontSize: 16, lineHeight: 24 },
   chart: { borderWidth: 1, borderRadius: radius.tile, padding: 16, marginTop: 8 },
   plot: { height: PLOT, marginTop: 12, flexDirection: 'row', alignItems: 'flex-end' },
+  column: { height: PLOT, alignItems: 'center', justifyContent: 'flex-end' },
   stack: {
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -356,7 +410,19 @@ const styles = StyleSheet.create({
   tiles: { flexDirection: 'row', gap: 8, marginTop: 8 },
   tilesStack: { flexDirection: 'column' },
   tile: { borderWidth: 1, borderRadius: radius.tile, padding: 16, minHeight: 124 },
-  tileFigure: { fontFamily: font.sansBold, fontSize: 40, lineHeight: 44 },
+  tileFigures: { flexDirection: 'row', alignItems: 'baseline', gap: 8, marginTop: 8 },
+  tileFigure: {
+    fontFamily: font.sansBold,
+    fontSize: 40,
+    lineHeight: 44,
+    includeFontPadding: false,
+  },
+  tileOf: {
+    fontFamily: font.sansBold,
+    fontSize: 24,
+    lineHeight: 30,
+    includeFontPadding: false,
+  },
   link: {
     fontFamily: font.sansMedium,
     fontSize: 14,
