@@ -11,7 +11,8 @@ import { countdownCopy, dayBucket, groupByLocalDay } from '@/ui/schedule';
 import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
 import { rowLabelLeft } from '@/ui/FieldStrip';
-import { formatLivePair, howLiveBindings } from '@/ui/howBindings';
+import { contrastRatio, logoContrastFails } from '@/logos/contrast';
+import { formatCount, formatLivePair, howLiveBindings, selectHowSummary } from '@/ui/howBindings';
 import { formatCompactWhen } from '@/ui/weekModel';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
@@ -192,8 +193,29 @@ describe('how live bindings', () => {
     });
     expect(sample?.marketLower).toBe(true);
     expect(formatLivePair(0.612, 0.588, 'en')).toBe('0.612 vs 0.588');
-    expect(formatLivePair(0.612, 0.588, 'es')).toBe('0,612 vs 0,588');
+    expect(formatLivePair(0.612, 0.588, 'es')).toBe('0,612 contra 0,588');
     expect(sample).not.toMatchObject({ k: 23, n: 29 });
+  });
+});
+
+describe('logo contrast', () => {
+  test('Giants navy on the dark card is under 3 to 1', () => {
+    expect(contrastRatio('#001D67', '#262B30')).toBeCloseTo(1.07, 1);
+    expect(logoContrastFails(['#001D67', '#A71930'], '#262B30')).toBe(true);
+    expect(logoContrastFails(['#5A1414', '#FFB612'], '#262B30')).toBe(false);
+  });
+});
+
+describe('how fixture gate', () => {
+  test('a release build ignores the screenshot fixture', () => {
+    expect(selectHowSummary(null, true, false)).toBeNull();
+    expect(selectHowSummary(null, true, true)).toMatchObject({
+      pick_hits: 11,
+      pick_misses: 5,
+      model_log_loss: 0.612,
+      market_log_loss: 0.588,
+    });
+    expect(formatCount(7000, 'es')).not.toContain(',');
   });
 });
 

@@ -131,10 +131,10 @@ export const en = {
   'how.s1.p2':
     'That history starts in 1999. The model trains on every completed game up to before week 10 of 2026.',
   'how.s1.p3': 'Updates when games finish, not live.',
-  'how.s1.caption': 'More than 7,000 games since 1999.',
+  'how.s1.caption': 'More than {n} games since 1999.',
   'how.s1.cd':
-    'A timeline of seasons from 1999 to 2026, with ticks at 2016 and 2024. Each season shows a band for results and a band for plays. Those band heights are illustrative. The model trains on every completed game up to before week 10 of 2026, more than 7,000 games since 1999. 2026 is a partial season. Updates when games finish, not live.',
-  'how.s1.games': 'More than 7,000 games',
+    'A timeline of seasons from 1999 to 2026, with ticks at 2016 and 2024. Each season shows a band for results and a band for plays. Those band heights are illustrative. The model trains on every completed game up to before week 10 of 2026, more than {n} games since 1999. 2026 is a partial season. Updates when games finish, not live.',
+  'how.s1.games': 'More than {n} games',
   'how.s2.title': 'It weighs two teams, then learns a home edge.',
   'how.s2.p1':
     'It looks at recent form: how the offense and defense have been playing, play by play, over the last 10 games.',
@@ -183,13 +183,13 @@ export const en = {
   'how.s6.p1':
     'Log loss is a score for how close the probabilities were to what happened. Lower is better.',
   'how.s6.p2':
-    'On the holdout from 2024 to 2025, 570 games, the market has a lower log loss than the model, 0.598 against 0.621. This is an open experiment, not a recommendation.',
+    'On the holdout from 2024 to 2025, 570 games, the market has a lower log loss than the model, {market} against {model}. This is an open experiment, not a recommendation.',
   'how.s6.p3': 'The bars share a scale from 0 to 1. Neither bar is colored as a winner.',
   'how.s6.model': 'Model',
   'how.s6.market': 'Market',
   'how.s6.lower': 'Lower is better',
   'how.s6.cd':
-    'A log loss comparison on the holdout 2024 to 2025, 570 games. Model 0.621. Market 0.598. Lower is better. The market is lower. A secondary 2026 season to date row, small sample, with {model_ll} and {market_ll}, and an example of 0.559 vs 0.506. A link to the model card.',
+    'A log loss comparison on the holdout 2024 to 2025, 570 games. Model {model}. Market {market}. Lower is better. The market is lower. A secondary 2026 season to date row, small sample, with {model_ll} and {market_ll}. A link to the model card.',
   'how.chart.empty': 'No chart data yet.',
   'how.chart.loading': 'Loading the chart.',
   'how.chart.error': 'The chart could not be loaded.',
@@ -197,7 +197,7 @@ export const en = {
   'how.season.tick': '{y}',
   'how.step': '{n}',
   'how.s3.exact.title': 'The exact rule',
-  'how.s1.foot': 'More than 7,000 games since 1999.',
+  'how.s1.foot': 'More than {n} games since 1999.',
   'how.s1.results': 'Results',
   'how.s1.plays': 'Plays',
   'how.s1.partial': 'partial',
@@ -354,10 +354,10 @@ export const es = {
   'how.s1.p2':
     'Esa historia empieza en 1999. El modelo entrena con todos los juegos completados hasta antes de la semana 10 de 2026.',
   'how.s1.p3': 'Se actualiza cuando terminan los juegos, no en vivo.',
-  'how.s1.caption': 'Más de 7,000 juegos desde 1999.',
+  'how.s1.caption': 'Más de {n} juegos desde 1999.',
   'how.s1.cd':
-    'Línea de tiempo de temporadas de 1999 a 2026, con marcas en 2016 y 2024. Cada temporada muestra una franja de resultados y una de jugadas. Las alturas de esas franjas son ilustrativas. El modelo entrena con todos los juegos completados hasta antes de la semana 10 de 2026, más de 7,000 juegos desde 1999. 2026 es una temporada parcial. Se actualiza cuando terminan los juegos, no en vivo.',
-  'how.s1.games': 'Más de 7,000 juegos',
+    'Línea de tiempo de temporadas de 1999 a 2026, con marcas en 2016 y 2024. Cada temporada muestra una franja de resultados y una de jugadas. Las alturas de esas franjas son ilustrativas. El modelo entrena con todos los juegos completados hasta antes de la semana 10 de 2026, más de {n} juegos desde 1999. 2026 es una temporada parcial. Se actualiza cuando terminan los juegos, no en vivo.',
+  'how.s1.games': 'Más de {n} juegos',
   'how.s2.title': 'Pesa a los dos equipos y aprende la ventaja de local.',
   'how.s2.p1':
     'Mira la forma reciente: cómo han jugado la ofensiva y la defensiva, jugada a jugada, en los últimos 10 juegos.',
@@ -407,13 +407,13 @@ export const es = {
   'how.s6.p1':
     'El log loss mide qué tan cerca estuvieron las probabilidades de lo que ocurrió. Más bajo es mejor.',
   'how.s6.p2':
-    'En el holdout de 2024 a 2025, 570 juegos, el mercado tiene menor log loss que el modelo, 0,598 contra 0,621. Esto es un experimento abierto, no una recomendación.',
+    'En el holdout de 2024 a 2025, 570 juegos, el mercado tiene menor log loss que el modelo, {market} contra {model}. Esto es un experimento abierto, no una recomendación.',
   'how.s6.p3': 'Las barras comparten una escala de 0 a 1. Ninguna se colorea como ganadora.',
   'how.s6.model': 'Modelo',
   'how.s6.market': 'Mercado',
   'how.s6.lower': 'Más bajo es mejor',
   'how.s6.cd':
-    'Comparación de log loss en el holdout 2024 a 2025, 570 juegos. Modelo 0,621. Mercado 0,598. Más bajo es mejor. El mercado queda más bajo. Una fila secundaria de la temporada 2026 hasta hoy, muestra pequeña, con {model_ll} y {market_ll}, y un ejemplo de 0,559 contra 0,506. Un enlace a la model card.',
+    'Comparación de log loss en el holdout 2024 a 2025, 570 juegos. Modelo {model}. Mercado {market}. Más bajo es mejor. El mercado queda más bajo. Una fila secundaria de la temporada 2026 hasta hoy, muestra pequeña, con {model_ll} y {market_ll}. Un enlace a la model card.',
   'how.chart.empty': 'Todavía no hay datos para el gráfico.',
   'how.chart.loading': 'Cargando el gráfico.',
   'how.chart.error': 'No se pudo cargar el gráfico.',
@@ -421,7 +421,7 @@ export const es = {
   'how.season.tick': '{y}',
   'how.step': '{n}',
   'how.s3.exact.title': 'La regla exacta',
-  'how.s1.foot': 'Más de 7,000 juegos desde 1999.',
+  'how.s1.foot': 'Más de {n} juegos desde 1999.',
   'how.s1.results': 'Resultados',
   'how.s1.plays': 'Jugadas',
   'how.s1.partial': 'parcial',

@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render, waitFor } from '@testing-library/react-native';
 
@@ -8,6 +11,7 @@ import { HowScreen } from './HowScreen';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ back: () => undefined, push: () => undefined }),
+  useLocalSearchParams: () => ({}),
 }));
 
 jest.mock('react-native-safe-area-context', () => ({
@@ -51,5 +55,7 @@ describe('how screen bindings', () => {
     expect(view.queryByText(/0\.559/)).toBeNull();
     expect(view.queryByText(/0\.506/)).toBeNull();
     expect(view.queryByText(/0\.003/)).toBeNull();
+    const source = fs.readFileSync(path.join(process.cwd(), 'src/ui/HowScreen.tsx'), 'utf8');
+    expect(source).not.toMatch(/0\.559|0\.506|23 of 29|7,000|0,621/);
   });
 });

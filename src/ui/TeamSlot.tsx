@@ -5,34 +5,38 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { teamLogos } from '@/config/features';
 import { useI18n } from '@/i18n/LocaleProvider';
+import { logoContrastFails } from '@/logos/contrast';
 import { logoCacheKey, monogramLetters, resolveLogoStep } from '@/logos/resolve';
-import { font } from '@/theme/h2';
+import { font, lightPalette } from '@/theme/h2';
 import { useH2Theme } from '@/theme/ThemeProvider';
 
 type TeamSlotProps = {
   name: string;
   abbr: string;
   color: string | null;
+  color2?: string | null;
   logoUrl: string | null;
   size: number;
 };
 
 type CacheEntry = { url: string; savedAt: number };
 
-export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
+export function TeamSlot({ name, abbr, color, color2 = null, logoUrl, size }: TeamSlotProps) {
   const { t } = useI18n();
   const { palette } = useH2Theme();
   const [networkFailed, setNetworkFailed] = useState(false);
   const [cached, setCached] = useState<CacheEntry | null>(null);
   const [now] = useState(() => Date.now());
   const letters = monogramLetters(abbr, name);
+  const dark = palette.bg !== lightPalette.bg;
+  const lowContrast = dark && logoContrastFails([color, color2], palette.surface);
   const step = resolveLogoStep({
     enabled: teamLogos.enabled && Boolean(logoUrl),
     cacheSavedAt: cached?.savedAt ?? null,
     now,
     networkFailed,
   });
-  const showImage = step !== 'monogram' && Boolean(logoUrl);
+  const showImage = !lowContrast && step !== 'monogram' && Boolean(logoUrl);
   const label = showImage ? t('logo.cd', { team: name }) : t('logo.cd.mono', { team: name });
 
   useEffect(() => {
@@ -65,10 +69,10 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: showImage ? 'transparent' : palette.surface,
-          borderColor: color ?? palette.borderStrong,
+          backgroundColor: 'transparent',
+          borderColor: palette.borderStrong,
           flexShrink: 0,
-          borderWidth: showImage ? 0 : 1.5,
+          borderWidth: showImage ? 0 : 1,
         },
       ]}
     >

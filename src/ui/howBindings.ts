@@ -40,8 +40,36 @@ export function formatLoss(value: number, locale: string): string {
   }).format(value);
 }
 
+export function formatCount(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
+}
+
+export function liveConnector(locale: string): string {
+  return locale.startsWith('es') ? 'contra' : 'vs';
+}
+
 export function formatLivePair(model: number, market: number, locale: string): string {
-  return `${formatLoss(model, locale)} vs ${formatLoss(market, locale)}`;
+  return `${formatLoss(model, locale)} ${liveConnector(locale)} ${formatLoss(market, locale)}`;
+}
+
+/** Screenshot and test fixture. Release builds ignore the request. */
+export const howTrackFixture = {
+  pick_hits: 11,
+  pick_misses: 5,
+  model_log_loss: 0.612,
+  market_log_loss: 0.588,
+  sample_label: 'small',
+} as const;
+
+export function selectHowSummary<T>(
+  live: T,
+  requested: boolean,
+  dev = __DEV__,
+): T | typeof howTrackFixture {
+  if (requested && dev) {
+    return howTrackFixture;
+  }
+  return live;
 }
 
 /** Break only after a slash. The repo name keeps a non-breaking hyphen. */

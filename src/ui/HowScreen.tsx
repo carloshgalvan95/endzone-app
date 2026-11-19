@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Line } from 'react-native-svg';
 
 import { useTrackRecord } from '@/data/queries';
 import { useI18n } from '@/i18n/LocaleProvider';
@@ -11,7 +12,14 @@ import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { TopBar } from './Chrome';
 import { ModelStrip } from './FieldStrip';
-import { formatLivePair, howLiveBindings, linkBreaks } from './howBindings';
+import {
+  formatCount,
+  formatLivePair,
+  formatLoss,
+  howLiveBindings,
+  linkBreaks,
+  selectHowSummary,
+} from './howBindings';
 
 const YEARS = [1999, 2016, 2024, 2026] as const;
 
@@ -23,8 +31,10 @@ export function HowScreen() {
   const [coverRule, setCoverRule] = useState(false);
   const [gateRule, setGateRule] = useState(false);
   const record = useTrackRecord();
+  const params = useLocalSearchParams<{ fixture?: string }>();
   const season = record.data?.available ? record.data.seasons[0] : undefined;
-  const live = howLiveBindings(season?.summary ?? null);
+  const summary = selectHowSummary(season?.summary ?? null, params.fixture === 'track');
+  const live = howLiveBindings(summary);
   const foot = t('how.s6.foot');
   const urlAt = foot.indexOf('https://');
   const footLead = urlAt >= 0 ? foot.slice(0, urlAt) : foot;
@@ -55,7 +65,7 @@ export function HowScreen() {
             stamp={t('how.illustrative')}
             plays={t('how.s1.plays')}
             results={t('how.s1.results')}
-            foot={t('how.s1.foot')}
+            foot={t('how.s1.foot', { n: formatCount(7000, locale) })}
           />
         </Step>
 
@@ -119,7 +129,12 @@ export function HowScreen() {
 
         <Step index={5} n="06" title={t('how.s6.title')} palette={palette}>
           <Body palette={palette}>{t('how.s6.p1')}</Body>
-          <Body palette={palette}>{t('how.s6.p2')}</Body>
+          <Body palette={palette}>
+            {t('how.s6.p2', {
+              market: formatLoss(howCalibration.holdoutMarket, locale),
+              model: formatLoss(howCalibration.holdoutModel, locale),
+            })}
+          </Body>
           <Body palette={palette}>{t('how.s6.p3')}</Body>
           <Honesty
             label={t('how.s6.holdout')}
@@ -327,7 +342,10 @@ function Strength({
         <View style={[styles.beam, { backgroundColor: palette.text }]} />
         <View style={[styles.fulcrum, { borderTopColor: palette.text }]} />
       </View>
-      <View style={[styles.drop, { backgroundColor: palette.textMuted }]} />
+      <View style={styles.arrowCol}>
+        <View style={[styles.drop, { backgroundColor: palette.textMuted }]} />
+        <View style={[styles.arrowHead, { borderTopColor: palette.textMuted }]} />
+      </View>
       <View style={[styles.pill, { borderColor: palette.border }]}>
         <Text style={[styles.pillText, { color: palette.text }]}>{home}</Text>
       </View>
@@ -446,9 +464,9 @@ function CoverRule({ palette, example }: { palette: H2Palette; example: string }
                       <View
                         key={dot}
                         style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: 4,
+                          width: 6,
+                          height: 6,
+                          borderRadius: 3,
                           backgroundColor: dot < 7 ? palette.text : palette.border,
                         }}
                       />
@@ -532,55 +550,118 @@ function CalibrationPlot({
   const [width, setWidth] = useState(358);
   const innerW = Math.max(1, width - AXIS * 2);
   const innerH = 268 - AXIS * 2;
+  const originX = AXIS;
+  const originY = 268 - AXIS;
   return (
     <View
       onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
       style={[styles.plot, { borderColor: palette.border }]}
     >
-      {Array.from({ length: 16 }, (_, index) => {
-        const t = (index + 0.5) / 16;
-        return (
-          <View
-            key={index}
-            style={{
-              position: 'absolute',
-              width: 5,
-              height: 2,
-              backgroundColor: palette.textMuted,
-              left: AXIS + t * innerW - 2,
-              bottom: AXIS + t * innerH - 1,
-            }}
-          />
-        );
-      })}
+      <Svg width={width} height={268} style={StyleSheet.absoluteFill}>
+        <Line
+          x1={originX}
+          y1={originY}
+          x2={originX + innerW}
+          y2={originY - innerH}
+          stroke={palette.textMuted}
+          strokeWidth={1}
+          strokeDasharray="4 4"
+        />
+        <Line
+          x1={originX}
+          y1={AXIS}
+          x2={originX}
+          y2={originY}
+          stroke={palette.textMuted}
+          strokeWidth={1}
+        />
+        <Line
+          x1={originX}
+          y1={originY}
+          x2={originX + innerW}
+          y2={originY}
+          stroke={palette.textMuted}
+          strokeWidth={1}
+        />
+      </Svg>
       {howCalibration.pred.map((pred, index) => (
         <View
           key={`bin-${index}`}
           style={[
             styles.point,
             {
-              left: AXIS + pred * innerW - 4,
-              bottom: AXIS + (howCalibration.obs[index] ?? 0) * innerH - 4,
+              left: originX + pred * innerW - 4,
+              top: originY - (howCalibration.obs[index] ?? 0) * innerH - 4,
               backgroundColor: palette.model,
             },
           ]}
         />
       ))}
-      <Text style={[styles.axisTick, { left: AXIS, bottom: 22, color: palette.textMuted }]}>0</Text>
-      <Text style={[styles.axisTick, { right: 8, bottom: 22, color: palette.textMuted }]}>1</Text>
-      <Text style={[styles.axisTick, { left: 10, bottom: AXIS, color: palette.textMuted }]}>0</Text>
-      <Text style={[styles.axisTick, { left: 10, top: 22, color: palette.textMuted }]}>1</Text>
       <Text
         style={[
+          styles.axisTick,
+          {
+            left: originX - 8,
+            top: originY + 6,
+            width: 16,
+            textAlign: 'center',
+            color: palette.textMuted,
+          },
+        ]}
+      >
+        0
+      </Text>
+      <Text
+        style={[
+          styles.axisTick,
+          {
+            left: originX + innerW - 8,
+            top: originY + 6,
+            width: 16,
+            textAlign: 'center',
+            color: palette.textMuted,
+          },
+        ]}
+      >
+        1
+      </Text>
+      <Text
+        style={[
+          styles.axisTick,
+          { width: originX - 6, top: originY - 7, textAlign: 'right', color: palette.textMuted },
+        ]}
+      >
+        0
+      </Text>
+      <Text
+        style={[
+          styles.axisTick,
+          { width: originX - 6, top: AXIS - 7, textAlign: 'right', color: palette.textMuted },
+        ]}
+      >
+        1
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={[
           styles.axisTitle,
-          { left: AXIS, right: 8, bottom: 4, textAlign: 'center', color: palette.textMuted },
+          {
+            left: AXIS,
+            right: 8,
+            top: originY + 22,
+            textAlign: 'center',
+            color: palette.textMuted,
+          },
         ]}
       >
         {predTitle}
       </Text>
       <Text
         numberOfLines={1}
-        style={[styles.axisTitle, { left: AXIS, top: 4, width: 180, color: palette.textMuted }]}
+        style={[
+          styles.axisTitle,
+          { left: AXIS + 12, top: 4, width: 180, color: palette.textMuted },
+        ]}
       >
         {obsTitle}
       </Text>
@@ -689,7 +770,17 @@ const styles = StyleSheet.create({
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
   },
-  drop: { width: 2, height: 12, marginTop: 2 },
+  arrowCol: { alignSelf: 'center', alignItems: 'center', marginTop: 4 },
+  drop: { width: 2, height: 12 },
+  arrowHead: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 4,
+    borderRightWidth: 4,
+    borderTopWidth: 5,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+  },
   mono: {
     width: 32,
     height: 32,
@@ -699,7 +790,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pill: {
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 8,
@@ -725,11 +816,11 @@ const styles = StyleSheet.create({
   cardRow: { flexDirection: 'row', gap: 8 },
   stateCol: { flex: 1 },
   leader: { width: 1, height: 16, alignSelf: 'center' },
-  stateCard: { borderWidth: 1, borderRadius: 12, padding: 6, marginTop: 0 },
+  stateCard: { borderWidth: 1, borderRadius: 12, padding: 8, marginTop: 0 },
   example: { fontFamily: font.sans, fontSize: 12, lineHeight: 16 },
   exampleFigure: { fontFamily: font.sansBold, fontSize: 40, lineHeight: 40 },
   stateText: { fontFamily: font.sansMedium, fontSize: 16, lineHeight: 24 },
-  dots: { flexDirection: 'row', gap: 4, marginTop: 4 },
+  dots: { flexDirection: 'row', gap: 3, marginTop: 4 },
   node: {
     height: 52,
     borderWidth: 1,
@@ -767,8 +858,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginLeft: -4,
-    marginBottom: -4,
   },
   link: { fontFamily: font.sansMedium, fontSize: 14, lineHeight: 20, marginTop: 16 },
   track: { height: 8, borderRadius: 4, overflow: 'hidden', marginTop: 4 },
