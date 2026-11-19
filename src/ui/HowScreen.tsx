@@ -12,7 +12,7 @@ import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { TopBar } from './Chrome';
 import { ModelStrip } from './FieldStrip';
-import { formatCount, howLiveBindings, linkBreaks, selectHowSummary } from './howBindings';
+import { formatCount, howLiveBindings, selectHowSummary } from './howBindings';
 
 const YEARS = [1999, 2016, 2024, 2026] as const;
 
@@ -28,10 +28,7 @@ export function HowScreen() {
   const season = record.data?.available ? record.data.seasons[0] : undefined;
   const summary = selectHowSummary(season?.summary ?? null, params.fixture === 'track');
   const live = howLiveBindings(summary);
-  const foot = t('how.s6.foot');
-  const urlAt = foot.indexOf('https://');
-  const footLead = urlAt >= 0 ? foot.slice(0, urlAt) : foot;
-  const footUrl = urlAt >= 0 ? foot.slice(urlAt) : '';
+  const methodUrl = record.data?.method_url ?? '';
 
   return (
     <View style={[styles.screen, { backgroundColor: palette.bg }]}>
@@ -105,7 +102,7 @@ export function HowScreen() {
 
         <Step index={4} n="05" title={t('how.s5.title')} palette={palette}>
           <Body palette={palette}>{t('how.s5.p1')}</Body>
-          <Body palette={palette}>{t('how.s5.p2', { n: howCalibration.nHoldout })}</Body>
+          <Body palette={palette}>{t('how.s5.p2')}</Body>
           <Text style={[styles.stamp, { color: palette.textMuted, marginTop: 24 }]}>
             {t('how.s5.holdout')}
           </Text>
@@ -122,11 +119,18 @@ export function HowScreen() {
 
         <Step index={5} n="06" title={t('how.s6.title')} palette={palette}>
           <Body palette={palette}>{t('how.s6.p1')}</Body>
-          <Pressable accessibilityRole="link" onPress={() => Linking.openURL(footUrl || '')}>
-            <Text style={[styles.link, { color: palette.text }]}>
-              {footLead}
-              {linkBreaks(footUrl)}
-            </Text>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={t('how.s6.cd')}
+            onPress={() => {
+              if (methodUrl) {
+                Linking.openURL(methodUrl).catch(() => undefined);
+              }
+            }}
+            style={styles.linkRow}
+          >
+            <Text style={[styles.link, { color: palette.modelLabel }]}>{t('how.s6.link')}</Text>
+            <View style={[styles.external, { borderColor: palette.modelLabel }]} />
           </Pressable>
         </Step>
       </ScrollView>
@@ -772,5 +776,18 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  link: { fontFamily: font.sansMedium, fontSize: 14, lineHeight: 20, marginTop: 16 },
+  linkRow: {
+    minHeight: 48,
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  link: {
+    fontFamily: font.sans,
+    fontSize: 16,
+    lineHeight: 24,
+    textDecorationLine: 'underline',
+  },
+  external: { width: 16, height: 16, borderWidth: 1.5, borderRadius: 2 },
 });

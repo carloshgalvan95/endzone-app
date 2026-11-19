@@ -349,8 +349,6 @@ export const field = {
   labelSeparateUnder: 18,
   modelRing: 16,
   modelStroke: 3,
-  marketCross: 12,
-  marketStroke: 2,
   x: (pHomePercent: number, width = 360) => {
     const scale = width / 360;
     return (30 + 3 * pHomePercent) * scale;
@@ -426,7 +424,6 @@ export const darkPalette = {
   accent: '#D04A63', // solo tipo grande o wordmark -mlops
   model: '#5A86D6',
   modelLabel: '#8AA6DC',
-  market: '#A9A396',
   accentNav: '#EDB01A',
   accentNavInk: '#151515',
   logoDisc: '#F4EEDF',
@@ -460,7 +457,6 @@ export const lightPalette = {
   accent: '#AE2440',
   model: '#22509B',
   modelLabel: '#22509B',
-  market: '#5E5950',
   accentNav: '#EDB01A',
   accentNavInk: '#151515',
   logoDisc: '#151515',
@@ -503,7 +499,6 @@ export const contrastDark = {
   modelOnSurface: 3.95, // no usar como cuerpo sobre surface
   modelOnPlayField: 4.94, // anillo O
   modelLabelOnPlayField: 7.28,
-  marketOnPlayField: 7.11, // X y etiqueta
   creamOnCrimsonHero: 6.12,
   inkOnCream: 15.78,
   inkOnYellow: 9.41,

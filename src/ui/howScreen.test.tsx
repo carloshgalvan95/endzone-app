@@ -57,34 +57,12 @@ describe('how screen bindings', () => {
     expect(source).not.toMatch(/0\.559|0\.506|23 of 29|7,000|0,621|0\.621|0\.598/);
   });
 
-  test('the holdout game count comes from the bundled file', async () => {
-    const saved = howCalibration.nHoldout;
-    await AsyncStorage.setItem('endzone-locale', 'en');
-    const view = await render(
-      <AppThemeProvider mode="light">
-        <LocaleProvider>
-          <HowScreen />
-        </LocaleProvider>
-      </AppThemeProvider>,
-    );
-    try {
-      await waitFor(() => {
-        expect(view.getByText(/570 games/)).toBeTruthy();
-      });
-      howCalibration.nHoldout = 999;
-      view.rerender(
-        <AppThemeProvider mode="light">
-          <LocaleProvider>
-            <HowScreen />
-          </LocaleProvider>
-        </AppThemeProvider>,
-      );
-      await waitFor(() => {
-        expect(view.getByText(/999 games/)).toBeTruthy();
-      });
-      expect(view.queryByText(/570 games/)).toBeNull();
-    } finally {
-      howCalibration.nHoldout = saved;
-    }
+  test('calibration points come from the bundled file, not a market pair', () => {
+    const source = fs.readFileSync(path.join(process.cwd(), 'src/ui/HowScreen.tsx'), 'utf8');
+    expect(source).not.toMatch(/0\.621|0\.598/);
+    expect(howCalibration.pred[0]).toBe(0.277);
+    expect(howCalibration.nHoldout).toBe(570);
+    expect(howCalibration).not.toHaveProperty('holdoutModel');
+    expect(howCalibration).not.toHaveProperty('holdoutMarket');
   });
 });

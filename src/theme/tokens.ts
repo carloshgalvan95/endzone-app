@@ -13,8 +13,6 @@ export type Palette = {
   accent: string;
   model: string;
   modelSoft: string;
-  market: string;
-  marketSoft: string;
   disagreement: string;
   disagreementInk: string;
   positive: string;
@@ -113,8 +111,6 @@ const darkPalette: Palette = {
   accent: '#D04A63',
   model: '#5A86D6',
   modelSoft: 'rgba(90, 134, 214, 0.18)',
-  market: '#A9A396',
-  marketSoft: 'rgba(169, 163, 150, 0.16)',
   disagreement: '#EDB01A',
   disagreementInk: '#151515',
   positive: '#5A86D6',
@@ -140,8 +136,6 @@ const lightPalette: Palette = {
   accent: '#AE2440',
   model: '#22509B',
   modelSoft: 'rgba(34, 80, 155, 0.12)',
-  market: '#5E5950',
-  marketSoft: 'rgba(94, 89, 80, 0.12)',
   disagreement: '#EDB01A',
   disagreementInk: '#151515',
   positive: '#22509B',

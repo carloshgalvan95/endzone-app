@@ -12,6 +12,7 @@ import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
 import { rowLabelLeft } from '@/ui/FieldStrip';
 import { darkLogoMark, darkLogoRatio, meanOpaqueContrast } from '@/logos/contrast';
+import { bestWeek, latestWeek, secondaryWeeks, weeksOnChart } from '@/ui/historyWeeks';
 import { formatCount, formatLoss, howLiveBindings, selectHowSummary } from '@/ui/howBindings';
 import { formatCompactWhen } from '@/ui/weekModel';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
@@ -70,12 +71,12 @@ describe('i18n catalog', () => {
       .slice(1)
       .map((line) => line.split(',')[0] ?? '')
       .filter((key) => key.length > 0);
-    expect(keys.length).toBe(178);
+    expect(keys.length).toBe(185);
     for (const key of keys) {
       expect(en[key as keyof typeof en]?.length).toBeGreaterThan(0);
       expect(es[key as keyof typeof es]?.length).toBeGreaterThan(0);
     }
-    expect(stringKeys).toHaveLength(178);
+    expect(stringKeys).toHaveLength(185);
     for (const value of [...Object.values(en), ...Object.values(es)]) {
       const lower = value.toLowerCase();
       expect(lower.includes('market') || lower.includes('mercado')).toBe(false);
@@ -213,6 +214,29 @@ describe('logo contrast', () => {
     expect(ratio).not.toBeNull();
     expect(darkLogoMark(abbr)).toBe(mark);
     expect((ratio ?? 0) < 3).toBe(mark === 'monogram');
+  });
+});
+
+describe('history weeks', () => {
+  const weeks = [
+    { week: 8, state: 'no_finals' as const, pick_hits: 0, pick_misses: 0 },
+    { week: 9, state: 'complete' as const, pick_hits: 14, pick_misses: 1 },
+    { week: 10, state: 'complete' as const, pick_hits: 9, pick_misses: 5 },
+    { week: 11, state: 'no_finals' as const, pick_hits: 0, pick_misses: 0 },
+    { week: 12, state: 'no_finals' as const, pick_hits: 0, pick_misses: 0 },
+  ];
+
+  test('draws from the first final through the current week', () => {
+    expect(weeksOnChart(weeks, 11).map((week) => week.week)).toEqual([9, 10, 11]);
+    expect(weeksOnChart(weeks, 10).map((week) => week.week)).toEqual([9, 10]);
+  });
+
+  test('picks the best week, then the latest, and collapses a single final', () => {
+    expect(bestWeek(weeks)?.week).toBe(9);
+    expect(latestWeek(weeks)?.week).toBe(10);
+    expect(secondaryWeeks(weeks).single).toBe(false);
+    expect(secondaryWeeks(weeks.filter((week) => week.week !== 10)).single).toBe(true);
+    expect(secondaryWeeks(weeks.filter((week) => week.week !== 10)).tiles[0]?.week).toBe(9);
   });
 });
 
