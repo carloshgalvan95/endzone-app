@@ -2,7 +2,7 @@
 
 Android and iOS client for the weekly NFL win probabilities published by [endzone-mlops](https://github.com/carloshgalvan95/endzone-mlops). Android is the first native target. The same Expo project is the iOS client later.
 
-Version 0.1.0. Application id `io.github.carloshgalvan95.endzone`. The app reads site data contract major version 1 and nothing else. It does not ship a model and it is not betting advice.
+Version 0.2.0. Application id `io.github.carloshgalvan95.endzone`. The app reads site data contract major version 1 and nothing else. It does not ship a model and it is not betting advice.
 
 ## Architecture
 
@@ -80,7 +80,7 @@ Colors, type, and spacing follow the site tokens (cream, black, blue, crimson, y
 
 ## Release
 
-Semantic versions. The app version in `package.json` and `app.json` is `0.1.0`, and `android.versionCode` is `2`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
+Semantic versions. The app version in `package.json` and `app.json` is `0.2.0`, and `android.versionCode` is `2`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
 
 ## License
 
