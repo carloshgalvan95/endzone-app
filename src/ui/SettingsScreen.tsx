@@ -118,11 +118,11 @@ export function SettingsScreen() {
             </Pressable>
           );
         })}
-        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: 16, marginBottom: 8 }]}>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: 16 }]}>
           {t('set.cache')}
         </Text>
-        <View style={styles.row}>
-          <Text style={[styles.kicker, { color: palette.textMuted, flex: 1 }]}>
+        <View style={styles.cacheRow}>
+          <Text style={[styles.muted, styles.cacheStamp, { color: palette.textMuted }]}>
             {cacheNote ??
               (savedAt
                 ? t('set.cache.when', {
@@ -147,7 +147,7 @@ export function SettingsScreen() {
           >
             <Text
               style={[
-                styles.body,
+                styles.clearText,
                 { color: palette.text, opacity: savedAt == null ? opacity.disabled : 1 },
               ]}
             >
@@ -213,7 +213,15 @@ const styles = StyleSheet.create({
   },
   body: { fontFamily: font.sans, fontSize: 16, lineHeight: 24, flex: 1 },
   muted: { fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
-  clear: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 8 },
+  clear: { height: 48, justifyContent: 'center', paddingHorizontal: 8 },
+  clearText: { fontFamily: font.sans, fontSize: 16, lineHeight: 20 },
+  cacheRow: {
+    height: 48,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cacheStamp: { flex: 1 },
   option: { minHeight: langOption.minHeight, flexDirection: 'row', alignItems: 'center', gap: 12 },
   radio: {
     width: langOption.radio,

@@ -50,3 +50,20 @@ export function formatLocalWhen(iso: string, locale: string): string {
     minute: '2-digit',
   }).format(date);
 }
+
+/** Compact bar stamp: the moment only, with no Saved / Guardado word. */
+export function formatCompactWhen(iso: string, locale: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  const clean = (part: string) => part.replace(/\./g, '');
+  const weekday = clean(new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(date));
+  const month = clean(new Intl.DateTimeFormat(locale, { month: 'short' }).format(date));
+  const day = new Intl.DateTimeFormat(locale, { day: 'numeric' }).format(date);
+  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(date);
+  if (locale.startsWith('es')) {
+    return `${weekday} ${day} ${month}, ${time}`;
+  }
+  return `${weekday} ${month} ${day}, ${time}`;
+}

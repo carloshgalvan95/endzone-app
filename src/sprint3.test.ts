@@ -10,7 +10,9 @@ import { hydratePreference } from '@/prefs/hydratePreference';
 import { countdownCopy, dayBucket, groupByLocalDay } from '@/ui/schedule';
 import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
+import { rowLabelLeft } from '@/ui/FieldStrip';
 import { formatLivePair, howLiveBindings } from '@/ui/howBindings';
+import { formatCompactWhen } from '@/ui/weekModel';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
 import { widgetMark } from '@/widget/mark';
@@ -191,6 +193,24 @@ describe('how live bindings', () => {
     expect(sample?.marketLower).toBe(true);
     expect(formatLivePair(0.612, 0.588, 'en')).toBe('0.612 vs 0.588');
     expect(formatLivePair(0.612, 0.588, 'es')).toBe('0,612 vs 0,588');
+    expect(sample).not.toMatchObject({ k: 23, n: 29 });
+  });
+});
+
+describe('row label and compact stamp', () => {
+  test('keeps 6 dp from the ring and flips before the end zone', () => {
+    expect(rowLabelLeft(100, 40, 326)).toBe(114);
+    const flipped = rowLabelLeft(250, 80, 326);
+    expect(flipped).toBe(156);
+    expect(flipped + 80).toBe(250 - 14);
+  });
+
+  test('compact stamp drops the saved word', () => {
+    const iso = '2026-11-18T19:03:00Z';
+    expect(formatCompactWhen(iso, 'en')).toMatch(/^Wed Nov 18,/);
+    expect(formatCompactWhen(iso, 'es')).toMatch(/^mié 18 nov,/);
+    expect(formatCompactWhen(iso, 'es')).not.toMatch(/Guardado/);
+    expect(formatCompactWhen(iso, 'en')).not.toMatch(/Saved/);
   });
 });
 

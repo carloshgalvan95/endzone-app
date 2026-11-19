@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { fieldMarkerX } from '@/slate/field';
@@ -15,15 +16,22 @@ type FieldStripProps = {
 
 const YARDS = [10, 20, 30, 40, 60, 70, 80, 90];
 
-/** 6 dp to the right of the ring, or 6 dp to the left if the label would pass the end zone. */
-export function rowLabelPercent(marker: number, letters: number, width: number): number {
-  const ring = 16;
-  const gap = 6;
-  const end = 6;
-  const label = Math.min(140, Math.max(48, letters * 7));
-  const right = marker + ring / 2 + gap;
-  const x = right + label <= width - end - 4 ? right : marker - ring / 2 - gap - label;
-  return (Math.max(end, x) / width) * 100;
+/**
+ * 6 dp clear of the ring. On the right, the left edge is ringX + 14.
+ * Flipped, the right edge is ringX - 14.
+ * Flip when ringX + 14 + label width would pass the field edge minus the end zone minus 4.
+ */
+export function rowLabelLeft(
+  ringX: number,
+  labelWidth: number,
+  fieldWidth: number,
+  end = 6,
+): number {
+  const limit = fieldWidth - end - 4;
+  if (ringX + 14 + labelWidth <= limit) {
+    return ringX + 14;
+  }
+  return ringX - 14 - labelWidth;
 }
 
 function Midline({ light, color, ink }: { light: boolean; color: string; ink: string }) {
@@ -39,7 +47,13 @@ function Midline({ light, color, ink }: { light: boolean; color: string; ink: st
   );
 }
 
-export function ModelStrip({ games }: { games: { id: string; pHome: number; kickoff: string }[] }) {
+export function ModelStrip({
+  games,
+  fill,
+}: {
+  games: { id: string; pHome: number; kickoff: string }[];
+  fill?: string;
+}) {
   const { palette } = useH2Theme();
   const light = palette.bg === lightPalette.bg;
   const frame = weekField.strip;
@@ -55,7 +69,7 @@ export function ModelStrip({ games }: { games: { id: string; pHome: number; kick
     <View
       style={[
         styles.field,
-        { height: frame.height, width: '100%', backgroundColor: palette.playField },
+        { height: frame.height, width: '100%', backgroundColor: fill ?? palette.playField },
       ]}
     >
       <View
@@ -100,7 +114,7 @@ export function ModelStrip({ games }: { games: { id: string; pHome: number; kick
                 borderRadius: size / 2,
                 borderWidth: placed.stroke,
                 borderColor: palette.model,
-                backgroundColor: palette.playField,
+                backgroundColor: fill ?? palette.playField,
               },
             ]}
           />
@@ -126,10 +140,20 @@ export function FieldStrip({ pHome, height, width, variant, caption, ringLabel }
   const basis = frame ? frame.width : field.width;
   const ringSize = field.modelRing;
   const ringLeft = ((marker - ringSize / 2) / basis) * 100;
+  const [fieldWidth, setFieldWidth] = useState(0);
+  const [labelWidth, setLabelWidth] = useState(0);
+  const ringX = fieldWidth > 0 ? (marker / basis) * fieldWidth : 0;
+  const labelLeft =
+    row && fieldWidth > 0 && labelWidth > 0
+      ? rowLabelLeft(ringX, labelWidth, fieldWidth, weekField.row.endZone)
+      : null;
   const zone = frame ? `${(frame.endZone / frame.width) * 100}%` : field.endZone;
   return (
     <View style={[styles.wrap, width ? { width } : null]}>
-      <View style={[styles.field, { height, width: width ?? '100%', backgroundColor: play }]}>
+      <View
+        onLayout={(event) => setFieldWidth(event.nativeEvent.layout.width)}
+        style={[styles.field, { height, width: width ?? '100%', backgroundColor: play }]}
+      >
         <View
           style={[
             styles.zonePct,
@@ -176,13 +200,15 @@ export function FieldStrip({ pHome, height, width, variant, caption, ringLabel }
           <Text
             maxFontSizeMultiplier={1.3}
             numberOfLines={1}
+            onLayout={(event) => setLabelWidth(event.nativeEvent.layout.width)}
             style={[
               styles.ringLabel,
               row
                 ? {
                     color: palette.modelLabel,
                     top: 4,
-                    left: `${rowLabelPercent(marker, ringLabel.length, basis)}%`,
+                    left: labelLeft ?? 0,
+                    opacity: labelLeft == null ? 0 : 1,
                   }
                 : {
                     color: palette.modelLabel,

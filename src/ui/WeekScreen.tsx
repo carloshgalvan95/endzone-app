@@ -32,7 +32,13 @@ import { hapticSelect } from './haptics';
 import { dayBucket, groupByLocalDay, type DayBucket } from './schedule';
 import { TeamSlot } from './TeamSlot';
 import { favoritePercentLabel, weekRowFigure } from './weekFigure';
-import { favoriteName, formatLocalWhen, gamePhase, shortName } from './weekModel';
+import {
+  favoriteName,
+  formatCompactWhen,
+  formatLocalWhen,
+  gamePhase,
+  shortName,
+} from './weekModel';
 
 const FIRST_RUN = 'endzone-first-run-seen';
 const EASE = Easing.bezier(0.2, 0, 0, 1);
@@ -203,8 +209,12 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
           <View style={[styles.chip, { borderColor: palette.text, alignSelf: 'center' }]}>
             <Text style={[styles.chipText, { color: palette.text }]}>{t('alpha')}</Text>
           </View>
-          <Text numberOfLines={1} style={[styles.saved, { color: palette.textMuted }]}>
-            {saved}
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="clip"
+            style={[styles.saved, { color: palette.textMuted }]}
+          >
+            {slate.generated_at ? formatCompactWhen(slate.generated_at, locale) : ''}
           </Text>
         </View>
       </Animated.View>

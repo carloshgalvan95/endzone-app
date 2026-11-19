@@ -36,8 +36,10 @@ type AppThemeProviderProps = {
 
 export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
   const system = useColorScheme();
+  const forced = mode != null;
   const [preference, setPreferenceState] = useState<ThemePreference>(themePref.default);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [ready, setReady] = useState(forced);
   const userChanged = useRef(false);
   const systemMode: ThemeMode = system === 'light' ? 'light' : 'dark';
   const resolved: ThemeMode = mode ?? resolveThemePreference(preference, systemMode);
@@ -68,7 +70,12 @@ export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
           hydratePreference(stored, current, userChanged.current, themePref.options),
         );
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) {
+          setReady(true);
+        }
+      });
     const subscription = AccessibilityInfo.addEventListener(
       'reduceMotionChanged',
       setReducedMotion,
@@ -81,6 +88,10 @@ export function AppThemeProvider({ children, mode }: AppThemeProviderProps) {
       subscription.remove();
     };
   }, []);
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <ThemeContext.Provider value={theme}>

@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTrackRecord } from '@/data/queries';
 import { useI18n } from '@/i18n/LocaleProvider';
-import { font, howCalibration, rhythm } from '@/theme/h2';
+import { font, howCalibration, lightPalette, rhythm, weekField } from '@/theme/h2';
 import type { H2Palette } from '@/theme/ThemeProvider';
 import { useH2Theme } from '@/theme/ThemeProvider';
 
@@ -103,23 +103,14 @@ export function HowScreen() {
         <Step index={4} n="05" title={t('how.s5.title')} palette={palette}>
           <Body palette={palette}>{t('how.s5.p1')}</Body>
           <Body palette={palette}>{t('how.s5.p2')}</Body>
-          <Text style={[styles.stamp, { color: palette.textMuted }]}>{t('how.s5.holdout')}</Text>
-          <View style={[styles.plot, { borderColor: palette.border }]}>
-            <View style={[styles.diagonal, { borderColor: palette.textMuted }]} />
-            {howCalibration.pred.map((pred, index) => (
-              <View
-                key={`bin-${index}`}
-                style={[
-                  styles.point,
-                  {
-                    left: `${pred * 100}%`,
-                    bottom: `${(howCalibration.obs[index] ?? 0) * 100}%`,
-                    backgroundColor: palette.model,
-                  },
-                ]}
-              />
-            ))}
-          </View>
+          <Text style={[styles.stamp, { color: palette.textMuted, marginTop: 24 }]}>
+            {t('how.s5.holdout')}
+          </Text>
+          <CalibrationPlot
+            palette={palette}
+            predTitle={t('how.s5.pred')}
+            obsTitle={t('how.s5.obs')}
+          />
           <Text style={[styles.foot, { color: palette.text }]}>{t('how.s5.note')}</Text>
           <Text style={[styles.foot, { color: palette.text }]}>
             {live ? t('how.s5.calls', { k: live.k, n: live.n }) : t('how.chart.empty')}
@@ -220,42 +211,86 @@ function Timeline({
   results: string;
   foot: string;
 }) {
-  const heights = [36, 52, 64, 28];
+  const heights = [48, 64, 80, 36];
   return (
-    <View style={[styles.chart, { height: 228, backgroundColor: palette.surface }]}>
-      <Text style={[styles.stamp, styles.stampAbs, { color: palette.textMuted }]}>{stamp}</Text>
-      <View style={styles.yearBlocks}>
-        {YEARS.map((year, index) => (
-          <View key={year} style={styles.yearBlock}>
-            <Text style={[styles.year, { color: palette.text }]}>{year}</Text>
-            {year === 2026 ? (
-              <Text style={[styles.year, { color: palette.textMuted }]}>{partial}</Text>
-            ) : (
-              <Text style={styles.year}> </Text>
-            )}
-            <View
-              style={{
-                height: heights[index],
-                backgroundColor: palette.blueDeep,
-                borderRadius: 2,
-                marginTop: 8,
-              }}
-            />
-            <View
-              style={{
-                height: Math.max(12, (heights[index] ?? 20) * 0.45),
-                backgroundColor: palette.crimsonDeep,
-                borderRadius: 2,
-                marginTop: 4,
-              }}
-            />
-          </View>
-        ))}
+    <View>
+      <View style={[styles.chart, { height: 228, backgroundColor: palette.surface }]}>
+        <Text style={[styles.stamp, styles.stampAbs, { color: palette.textMuted }]}>{stamp}</Text>
+        <View style={styles.yearBlocks}>
+          {YEARS.map((year, index) => (
+            <View key={year} style={styles.yearBlock}>
+              <Text style={[styles.year, { color: palette.text }]}>{year}</Text>
+              {year === 2026 ? (
+                <Text style={[styles.year, { color: palette.textMuted }]}>{partial}</Text>
+              ) : (
+                <Text style={styles.year}> </Text>
+              )}
+              <View
+                style={{
+                  height: heights[index],
+                  backgroundColor: palette.blueDeep,
+                  borderWidth: 1,
+                  borderColor: palette.fieldTick,
+                  borderRadius: 2,
+                  marginTop: 8,
+                }}
+              />
+              <View
+                style={{
+                  height: Math.max(12, (heights[index] ?? 20) * 0.4),
+                  backgroundColor: palette.surfaceRaised,
+                  borderWidth: 1,
+                  borderColor: palette.fieldTick,
+                  borderRadius: 2,
+                  marginTop: 4,
+                }}
+              />
+            </View>
+          ))}
+        </View>
+        <View style={styles.legend}>
+          <LegendSwatch
+            color={palette.blueDeep}
+            border={palette.fieldTick}
+            label={plays}
+            palette={palette}
+          />
+          <LegendSwatch
+            color={palette.surfaceRaised}
+            border={palette.fieldTick}
+            label={results}
+            palette={palette}
+          />
+        </View>
       </View>
-      <Text style={[styles.foot, { color: palette.textMuted }]}>
-        {plays} / {results}
-      </Text>
-      <Text style={[styles.foot, { color: palette.textMuted }]}>{foot}</Text>
+      <Text style={[styles.timelineFoot, { color: palette.textMuted }]}>{foot}</Text>
+    </View>
+  );
+}
+
+function LegendSwatch({
+  color,
+  border,
+  label,
+  palette,
+}: {
+  color: string;
+  border: string;
+  label: string;
+  palette: H2Palette;
+}) {
+  return (
+    <View style={styles.legendItem}>
+      <View
+        style={{
+          width: 12,
+          height: 12,
+          backgroundColor: color,
+          borderWidth: 1,
+          borderColor: border,
+        }}
+      />
+      <Text style={[styles.legendText, { color: palette.textMuted }]}>{label}</Text>
     </View>
   );
 }
@@ -273,23 +308,35 @@ function Strength({
   stamp: string;
   pLab: string;
 }) {
+  const light = palette.bg === lightPalette.bg;
+  const bar = palette.model;
   return (
     <View style={[styles.chart, { height: 340, backgroundColor: palette.surface }]}>
       <Text style={[styles.stamp, styles.stampAbs, { color: palette.textMuted }]}>{stamp}</Text>
       <View style={styles.balance}>
-        <Monogram letters="HK" palette={palette} />
-        <View style={styles.balanceBars}>
-          <View style={[styles.balanceBar, { width: '46%', backgroundColor: palette.blueDeep }]} />
-          <View style={[styles.balanceBar, { width: '72%', backgroundColor: palette.blueDeep }]} />
+        <View style={styles.pans}>
+          <View style={styles.pan}>
+            <Monogram letters="HK" palette={palette} />
+            <View style={[styles.vbar, { height: 28, backgroundColor: bar }]} />
+          </View>
+          <View style={styles.pan}>
+            <Monogram letters="ST" palette={palette} />
+            <View style={[styles.vbar, { height: 56, backgroundColor: bar }]} />
+          </View>
         </View>
-        <Monogram letters="ST" palette={palette} />
+        <View style={[styles.beam, { backgroundColor: palette.text }]} />
+        <View style={[styles.fulcrum, { borderTopColor: palette.text }]} />
       </View>
+      <View style={[styles.drop, { backgroundColor: palette.textMuted }]} />
       <View style={[styles.pill, { borderColor: palette.border }]}>
         <Text style={[styles.pillText, { color: palette.text }]}>{home}</Text>
       </View>
-      <Text style={[styles.foot, { color: palette.textMuted }]}>{out}</Text>
-      <ModelStrip games={[{ id: 'how-strength', pHome: 0.62, kickoff: '2026-01-01T00:00:00Z' }]} />
-      <Text style={[styles.foot, { color: palette.modelLabel }]}>{pLab}</Text>
+      <Text style={[styles.pLab, { color: palette.modelLabel }]}>{pLab}</Text>
+      <ModelStrip
+        fill={light ? weekField.playFieldInCard.light : weekField.playFieldInCard.dark}
+        games={[{ id: 'how-strength', pHome: 0.62, kickoff: '2026-01-01T00:00:00Z' }]}
+      />
+      <Text style={[styles.outLine, { color: palette.textMuted }]}>{out}</Text>
     </View>
   );
 }
@@ -311,70 +358,110 @@ function Monogram({ letters, palette }: { letters: string; palette: H2Palette })
 
 function CoverRule({ palette, example }: { palette: H2Palette; example: string }) {
   const { t } = useI18n();
+  const [rail, setRail] = useState(0);
   const marks = [
     { at: 52, card: t('cover.tossup') },
     { at: 69, card: 'seven' },
     { at: 96, card: t('cover.more9') },
   ];
+  const cardW = rail > 0 ? (rail - 16) / 3 : 0;
   return (
     <View style={[styles.chart, { backgroundColor: palette.surface }]}>
       <Text style={[styles.stamp, { color: palette.textMuted }]}>{t('how.illustrative')}</Text>
-      <View style={styles.ruleTrack}>
+      <View onLayout={(event) => setRail(event.nativeEvent.layout.width)} style={styles.ruleTrack}>
         <View style={[styles.ruleLine, { backgroundColor: palette.border }]} />
-        {[55, 95].map((tick) => (
-          <View
-            key={tick}
-            style={[styles.productTick, { left: `${tick}%`, backgroundColor: palette.textMuted }]}
-          />
-        ))}
         {marks.map((mark) => (
           <View
             key={mark.at}
-            style={[styles.thumb, { left: `${mark.at}%`, borderColor: palette.model }]}
+            style={[
+              styles.thumb,
+              {
+                left: `${mark.at}%`,
+                backgroundColor: palette.model,
+                borderColor: palette.surface,
+              },
+            ]}
+          />
+        ))}
+        {[0.55, 0.95].map((tick) => (
+          <View
+            key={tick}
+            style={[
+              styles.productTick,
+              { left: `${tick * 100}%`, backgroundColor: palette.textMuted },
+            ]}
           />
         ))}
       </View>
-      {marks.map((mark) => (
-        <View key={`card-${mark.at}`} style={styles.stateRow}>
-          <View style={[styles.leader, { backgroundColor: palette.border }]} />
-          <View style={[styles.stateCard, { borderColor: palette.border }]}>
-            <Text style={[styles.example, { color: palette.textMuted }]}>
-              {example} {mark.at}%
-            </Text>
-            {mark.card === 'seven' ? (
-              <View>
-                <Text
-                  allowFontScaling={false}
-                  style={[styles.exampleFigure, { color: palette.text }]}
-                >
-                  7
-                </Text>
-                <Text style={{ color: palette.text, fontFamily: font.sansBold, fontSize: 16 }}>
-                  {t('cover.in10.short')}
-                </Text>
-                <Text style={{ color: palette.text, fontFamily: font.sansMedium, fontSize: 16 }}>
-                  {t('cover.wins', { team: 'Hawks' })}
-                </Text>
-                <View style={styles.dots}>
-                  {Array.from({ length: 10 }, (_, dot) => (
-                    <View
-                      key={dot}
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 4,
-                        backgroundColor: dot < 7 ? palette.text : palette.border,
-                      }}
-                    />
-                  ))}
+      <View style={styles.leaderRow}>
+        {rail > 0
+          ? marks.map((mark, index) => {
+              const thumbX = (mark.at / 100) * rail;
+              const cardCenter = index * (cardW + 8) + cardW / 2;
+              const dx = cardCenter - thumbX;
+              const dy = 16;
+              const len = Math.hypot(dx, dy);
+              const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+              return (
+                <View
+                  key={`lead-${mark.at}`}
+                  style={{
+                    position: 'absolute',
+                    left: thumbX,
+                    top: 0,
+                    width: len,
+                    height: 1,
+                    backgroundColor: palette.textMuted,
+                    transform: [{ rotate: `${deg}deg` }],
+                    transformOrigin: 'left top',
+                  }}
+                />
+              );
+            })
+          : null}
+      </View>
+      <View style={styles.cardRow}>
+        {marks.map((mark) => (
+          <View key={`card-${mark.at}`} style={styles.stateCol}>
+            <View style={[styles.stateCard, { borderColor: palette.border }]}>
+              <Text style={[styles.example, { color: palette.textMuted }]}>
+                {example} {mark.at}%
+              </Text>
+              {mark.card === 'seven' ? (
+                <View>
+                  <Text
+                    allowFontScaling={false}
+                    style={[styles.exampleFigure, { color: palette.text }]}
+                  >
+                    7
+                  </Text>
+                  <Text style={{ color: palette.text, fontFamily: font.sansBold, fontSize: 16 }}>
+                    {t('cover.in10.short')}
+                  </Text>
+                  <Text style={{ color: palette.text, fontFamily: font.sansMedium, fontSize: 16 }}>
+                    {t('cover.wins', { team: 'Hawks' })}
+                  </Text>
+                  <View style={styles.dots}>
+                    {Array.from({ length: 10 }, (_, dot) => (
+                      <View
+                        key={dot}
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 4,
+                          backgroundColor: dot < 7 ? palette.text : palette.border,
+                        }}
+                      />
+                    ))}
+                  </View>
                 </View>
-              </View>
-            ) : (
-              <Text style={[styles.stateText, { color: palette.text }]}>{mark.card}</Text>
-            )}
+              ) : (
+                <Text style={[styles.stateText, { color: palette.text }]}>{mark.card}</Text>
+              )}
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
     </View>
   );
 }
@@ -427,6 +514,76 @@ function RuleFold({
         <Text style={[styles.ruleTitle, { color: palette.text }]}>{title}</Text>
       </Pressable>
       {open ? <Text style={[styles.monoRule, { color: palette.textMuted }]}>{body}</Text> : null}
+    </View>
+  );
+}
+
+const AXIS = 44;
+
+function CalibrationPlot({
+  palette,
+  predTitle,
+  obsTitle,
+}: {
+  palette: H2Palette;
+  predTitle: string;
+  obsTitle: string;
+}) {
+  const [width, setWidth] = useState(358);
+  const innerW = Math.max(1, width - AXIS * 2);
+  const innerH = 268 - AXIS * 2;
+  return (
+    <View
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+      style={[styles.plot, { borderColor: palette.border }]}
+    >
+      {Array.from({ length: 16 }, (_, index) => {
+        const t = (index + 0.5) / 16;
+        return (
+          <View
+            key={index}
+            style={{
+              position: 'absolute',
+              width: 5,
+              height: 2,
+              backgroundColor: palette.textMuted,
+              left: AXIS + t * innerW - 2,
+              bottom: AXIS + t * innerH - 1,
+            }}
+          />
+        );
+      })}
+      {howCalibration.pred.map((pred, index) => (
+        <View
+          key={`bin-${index}`}
+          style={[
+            styles.point,
+            {
+              left: AXIS + pred * innerW - 4,
+              bottom: AXIS + (howCalibration.obs[index] ?? 0) * innerH - 4,
+              backgroundColor: palette.model,
+            },
+          ]}
+        />
+      ))}
+      <Text style={[styles.axisTick, { left: AXIS, bottom: 22, color: palette.textMuted }]}>0</Text>
+      <Text style={[styles.axisTick, { right: 8, bottom: 22, color: palette.textMuted }]}>1</Text>
+      <Text style={[styles.axisTick, { left: 10, bottom: AXIS, color: palette.textMuted }]}>0</Text>
+      <Text style={[styles.axisTick, { left: 10, top: 22, color: palette.textMuted }]}>1</Text>
+      <Text
+        style={[
+          styles.axisTitle,
+          { left: AXIS, right: 8, bottom: 4, textAlign: 'center', color: palette.textMuted },
+        ]}
+      >
+        {predTitle}
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={[styles.axisTitle, { left: AXIS, top: 4, width: 180, color: palette.textMuted }]}
+      >
+        {obsTitle}
+      </Text>
     </View>
   );
 }
@@ -509,9 +666,30 @@ const styles = StyleSheet.create({
   yearBlocks: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 28 },
   yearBlock: { width: 64 },
   year: { fontFamily: font.monoMedium, fontSize: 12 },
-  balance: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 28 },
-  balanceBars: { flex: 1, gap: 8 },
-  balanceBar: { height: 16, borderRadius: 4 },
+  legend: { flexDirection: 'row', gap: 16, marginTop: 8 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendText: { fontFamily: font.sans, fontSize: 12, lineHeight: 16 },
+  timelineFoot: { fontFamily: font.sans, fontSize: 12, lineHeight: 16, marginTop: 8 },
+  balance: { marginTop: 16, alignItems: 'center' },
+  pans: {
+    width: '78%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  pan: { alignItems: 'center', gap: 6 },
+  vbar: { width: 16, borderRadius: 2 },
+  beam: { height: 3, width: '86%' },
+  fulcrum: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderTopWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+  },
+  drop: { width: 2, height: 12, marginTop: 2 },
   mono: {
     width: 32,
     height: 32,
@@ -529,9 +707,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   pillText: { fontFamily: font.sansMedium, fontSize: 12, lineHeight: 16 },
-  ruleTrack: { height: 28, marginTop: 16, justifyContent: 'center' },
-  ruleLine: { height: 2 },
-  productTick: { position: 'absolute', width: 2, height: 12, top: 8 },
+  pLab: { fontFamily: font.sans, fontSize: 11, lineHeight: 14, marginTop: 8 },
+  outLine: { fontFamily: font.sans, fontSize: 14, lineHeight: 20, marginTop: 4 },
+  ruleTrack: { height: 36, marginTop: 12, position: 'relative' },
+  ruleLine: { position: 'absolute', left: 0, right: 0, top: 13, height: 2 },
+  productTick: { position: 'absolute', width: 2, height: 8, top: 26, marginLeft: -1 },
   thumb: {
     position: 'absolute',
     width: 20,
@@ -540,11 +720,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     top: 4,
     marginLeft: -10,
-    backgroundColor: 'transparent',
   },
-  stateRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  leader: { width: 2, alignSelf: 'stretch' },
-  stateCard: { flex: 1, borderWidth: 1, borderRadius: 12, padding: 8 },
+  leaderRow: { height: 16, position: 'relative' },
+  cardRow: { flexDirection: 'row', gap: 8 },
+  stateCol: { flex: 1 },
+  leader: { width: 1, height: 16, alignSelf: 'center' },
+  stateCard: { borderWidth: 1, borderRadius: 12, padding: 6, marginTop: 0 },
   example: { fontFamily: font.sans, fontSize: 12, lineHeight: 16 },
   exampleFigure: { fontFamily: font.sansBold, fontSize: 40, lineHeight: 40 },
   stateText: { fontFamily: font.sansMedium, fontSize: 16, lineHeight: 24 },
@@ -578,15 +759,9 @@ const styles = StyleSheet.create({
   ruleButton: { minHeight: 48, justifyContent: 'center' },
   ruleTitle: { fontFamily: font.sansMedium, fontSize: 12, lineHeight: 16 },
   monoRule: { fontFamily: font.mono, fontSize: 12, lineHeight: 18 },
-  plot: { height: 268, marginTop: 16, borderWidth: 1, position: 'relative' },
-  diagonal: {
-    position: 'absolute',
-    left: 8,
-    right: 8,
-    top: '50%',
-    borderTopWidth: 1,
-    borderStyle: 'dashed',
-  },
+  plot: { height: 268, marginTop: 12, borderWidth: 1, position: 'relative' },
+  axisTick: { position: 'absolute', fontFamily: font.mono, fontSize: 11, lineHeight: 14 },
+  axisTitle: { position: 'absolute', fontFamily: font.sans, fontSize: 11, lineHeight: 14 },
   point: {
     position: 'absolute',
     width: 8,

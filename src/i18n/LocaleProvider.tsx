@@ -28,6 +28,7 @@ const LocaleContext = createContext<LocaleValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [preference, setPreferenceState] = useState<LocalePreference>('system');
+  const [ready, setReady] = useState(false);
   const userChanged = useRef(false);
   const device = getLocales()[0]?.languageCode ?? 'en';
   const locale = resolveLocale(preference, device);
@@ -43,7 +44,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
           hydratePreference(stored, current, userChanged.current, LOCALE_OPTIONS),
         );
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) {
+          setReady(true);
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -62,6 +68,10 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }),
     [locale, preference],
   );
+
+  if (!ready) {
+    return null;
+  }
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
