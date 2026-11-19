@@ -11,6 +11,16 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
+jest.mock('expo-localization', () => ({
+  getLocales: () => [{ languageCode: 'en' }],
+}));
+
+jest.mock('react-native-android-widget', () => ({
+  registerWidgetTaskHandler: jest.fn(),
+  FlexWidget: 'FlexWidget',
+  TextWidget: 'TextWidget',
+}));
+
 jest.mock('expo-notifications', () => ({
   AndroidImportance: { DEFAULT: 3 },
   SchedulableTriggerInputTypes: { WEEKLY: 'weekly' },

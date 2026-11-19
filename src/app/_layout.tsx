@@ -10,13 +10,20 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AppHeader } from '@/components/AppHeader';
 import { AppQueryProvider } from '@/data/QueryProvider';
 import { restoreTuesdayAlert } from '@/features/notifications/tuesday';
+import { LocaleProvider } from '@/i18n/LocaleProvider';
 import { AppThemeProvider, useTheme } from '@/theme/ThemeProvider';
+
+if (Platform.OS === 'android') {
+  // Home screen widgets are Android-only and are not loaded in Expo Go or on web.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/widget/register');
+}
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -32,7 +39,7 @@ function RootStack() {
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
-          header: () => <AppHeader />,
+          headerShown: false,
           contentStyle: { backgroundColor: theme.color.bg },
         }}
       >
@@ -41,6 +48,7 @@ function RootStack() {
         <Stack.Screen name="about" />
         <Stack.Screen name="record" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="how" />
         <Stack.Screen name="game/[gameId]" />
       </Stack>
     </>
@@ -75,9 +83,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AppThemeProvider>
-          <AppQueryProvider>
-            <RootStack />
-          </AppQueryProvider>
+          <LocaleProvider>
+            <AppQueryProvider>
+              <RootStack />
+            </AppQueryProvider>
+          </LocaleProvider>
         </AppThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

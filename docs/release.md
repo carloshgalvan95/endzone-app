@@ -1,6 +1,6 @@
 # Android release
 
-The app version is semantic. `0.2.0` is the current release: the record screen, game detail, the Tuesday alert, and split APKs. `0.1.0` was the first skeleton. A release tag is `v` plus the version in `package.json` and `app.json`, for example `v0.2.0`.
+The app version is semantic. `0.3.0` is the current release: the hybrid redesign, English and Spanish, the home screen widget, and runtime team logos. A release tag is `v` plus the version in `package.json` and `app.json`, for example `v0.3.0`.
 
 `.github/workflows/release-android.yml` runs when a tag matching `v*` is pushed. It builds a signed release APK with `npx expo prebuild --platform android` and Gradle `assembleRelease`. It does not use an EAS account. It attaches the APK to the GitHub Release for that tag.
 
@@ -54,8 +54,8 @@ I paste that output into `ANDROID_KEYSTORE_BASE64`. I do not commit the keystore
 4. Tag that commit and push the tag.
 
 ```bash
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.3.0
+git push origin v0.3.0
 ```
 
 The workflow checks that the tag, `package.json`, and `app.json` name the same version.

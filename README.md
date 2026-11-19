@@ -2,7 +2,7 @@
 
 Android and iOS client for the weekly NFL win probabilities published by [endzone-mlops](https://github.com/carloshgalvan95/endzone-mlops). Android is the first native target. The same Expo project is the iOS client later.
 
-Version 0.2.0. Application id `io.github.carloshgalvan95.endzone`. The app reads site data contract major version 1 and nothing else. It does not ship a model and it is not betting advice.
+Version 0.3.0. Application id `io.github.carloshgalvan95.endzone`. The app reads site data contract major version 1 and nothing else. It does not ship a model and it is not betting advice.
 
 ## Architecture
 
@@ -38,6 +38,12 @@ A missing `contract_version` means major 1, because files published before the f
 4. Record. Per week and season to date correct picks, plus model and market log loss. A small sample is labeled as one. The sentence follows the published numbers. On the current file the market has the lower log loss.
 5. Game detail. Tap a game. It shows the model home probability, the market comparison when the file has one, kickoff in the phone's local time, and the result when the game is final.
 6. Alerts. A Tuesday local notification, off until you turn it on. It stays on the phone. There is no push server.
+
+## Widget and logos
+
+The Android home screen widget is built with `react-native-android-widget` 0.26.0. It does not run in Expo Go. Use a development build (`npx expo run:android`) on Android 12 and 14. It shows the next kickoff, refreshes at most every 60 minutes, and opens `endzone://game/{id}`.
+
+Team logos load at runtime from the contract logo URLs. They are not stored in this repo or in the APK. `teamLogos.enabled` in `src/config/features.ts` is on for now. Turn it off before any store submission. Logos are third-party trademarks. See [docs/team-logos.md](docs/team-logos.md).
 
 ## Download
 
@@ -80,7 +86,7 @@ Colors, type, and spacing follow the site tokens (cream, black, blue, crimson, y
 
 ## Release
 
-Semantic versions. The app version in `package.json` and `app.json` is `0.2.0`, and `android.versionCode` is `2`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
+Semantic versions. The app version in `package.json` and `app.json` is `0.3.0`, and `android.versionCode` is `3`. A GitHub release tag `vX.Y.Z` builds signed Android APKs split by CPU. See [docs/release.md](docs/release.md). The signing keystore is created by hand and stored as GitHub Actions secrets. It is never generated or committed here.
 
 ## License
 

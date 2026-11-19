@@ -13,6 +13,7 @@ module.exports = defineConfig([
       '.expo/**',
       'coverage/**',
       'contracts/v1/*.schema.json',
+      'docs/**',
     ],
   },
   expoConfig,
