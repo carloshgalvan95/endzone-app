@@ -1,107 +1,115 @@
-key,en,es,max_length,notes
-nav.week,Week,Semana,12,
-nav.history,History,Historial,12,
-nav.settings,Settings,Ajustes,12,
-week.kicker,Week,Semana,12,
-week.title,Week {n},Semana {n},16,n = week number
-week.count,{n} games,{n} juegos,16,"n = 14 to 16, plural in both"
-week.saved,Saved {dt},Guardado {dt},36,dt = locale timestamp
-week.empty,This week has no published games.,Esta semana no tiene juegos publicados.,48,
-week.choose,Choose a week,Elegir semana,22,
-week.contract,Update the app to see this week.,Actualiza la app para ver esta semana.,48,
-week.contract.body,The data contract changed and this version cannot read it.,El contrato de datos cambió y esta versión no puede leerlo.,72,
-week.release,Go to the release,Ir al release,24,
-chip.final,Final,Final,8,
-chip.tie,Final · Tie,Final · Empate,18,
-chip.live,In play,En juego,12,
-chip.tossup,Toss-up,Juego parejo,16,
-cover.in10,{n} in 10,{n} de cada 10,22,"n is 5 to 9, never 10. Also used as ""in 10"" / ""de cada 10"" next to the figure."
-cover.in10.short,in 10,de 10,8,row figure caption
-cover.tossup,Toss-up,Juego parejo,16,
-cover.more9,More than 9 in 10,Más de 9 de cada 10,24,
-cover.wins,{team} win,gana {team},40,"team = named favorite. EN verb is ""win"" for the franchise name."
-cover.old,The model had {n} in 10 for {team}.,El modelo daba {n} de cada 10 a {team}.,56,n = 5 to 9
-detail.localtime,PHONE LOCAL TIME,HORA DE ESTE TELÉFONO,24,
-detail.livekicker,IN PLAY · PRE-KICKOFF PROBABILITY,EN JUEGO · PROBABILIDAD PREVIA AL SAQUE,44,
-detail.model,MODEL,MODELO,8,
-detail.near50,The model places this game near 50%.,El modelo sitúa este juego cerca de 50%.,48,
-detail.dots,"In 10 games like this, {team} win {n}.","En 10 partidos como este, {team} gana {n}.",80,n = 5 to 9
-detail.dots.tossup,"In 10 games like this, each side wins about 5. Toss-up.","En 10 partidos como este, cada lado gana cerca de 5. Juego parejo.",80,
-detail.countdown,Starts in {d} d {h} h,Empieza en {d} d {h} h,28,"d, h integers"
-detail.footer,Open ML experiment. Not a recommendation.,Experimento abierto de ML. Esto no es una recomendación.,56,
-how.honest,In 2026 the market has a lower log loss than the model. This is not a recommendation.,En 2026 el mercado tiene menor log loss que el modelo. Esto no es una recomendación.,110,History and How it is calculated only
-how.cover,"The cover figure names the model favorite. pFav = max(p, 1-p). n is 5 to 9. Below 55 percent: Toss-up. From 95 percent: More than 9 in 10.","La cifra de portada nombra al favorito del modelo. pFav = max(p, 1-p). n va de 5 a 9. Por debajo de 55 por ciento: Juego parejo. Desde 95 por ciento: Más de 9 de cada 10.",180,
-how.field,"The field shows only the model. The ring sits at x = 30 + 3p, with p for the home team. The label is the named favorite's probability.","El campo muestra solo el modelo. El anillo se coloca en x = 30 + 3p, con p del equipo local. La etiqueta es la probabilidad del favorito nombrado.",180,
-detail.how,How it is calculated,Cómo se calcula,24,
-detail.tie.note,A tie does not count in the log loss.,Un empate no cuenta en el log loss.,48,
-detail.at,{away} at {home},{away} en {home},64,"full names, up to 2 lines"
-detail.compact,{away} at {home},{away} en {home},28,first word of each name
-field.visitor,Visitor,Visitante,12,
-field.home,Home,Local,8,
-hist.season,Season {y},Temporada {y},20,
-hist.title,The market is better calibrated.,El mercado está mejor calibrado.,44,
-hist.sub,Its log loss is lower. Lower is better.,Su log loss es más bajo. Más bajo es mejor.,52,
-hist.sample,"{have} of {need} decided games, the contract threshold.","{have} de {need} juegos decididos, el umbral del contrato.",72,example 29 of 48
-hist.weekly,Log loss by week · lower is better,Log loss por semana · menor es mejor,44,
-hist.nofinals,No finals,Sin finales,16,
-hist.calls,Correct calls,Aciertos,16,
-hist.calls.n,{hits} of {n},{hits} de {n},16,example 23 of 29
-hist.calls.note,On decided games this season.,En los juegos decididos de esta temporada.,40,
-hist.ll,Log loss,Log loss,12,
-hist.na,This season's history is not available yet.,El historial de esta temporada no está disponible todavía.,64,
-hist.kicker,History,Historial,12,
-set.title,Settings,Ajustes,12,
-set.alert,Tuesday alert,Aviso del martes,20,
-set.off,Off,Apagado,12,
-set.on,On,Encendido,12,
-set.theme,Theme,Tema,10,
-set.theme.auto,Auto,Auto,8,
-set.theme.dark,Dark,Oscuro,10,
-set.theme.light,Light,Claro,10,
-set.cache,Saved data,Datos guardados,20,
-set.clear,Clear,Borrar,10,
-set.about,About,Acerca,10,
-set.about.body,Open ML experiment. Not a recommendation.,Experimento abierto de ML. Esto no es una recomendación.,56,
-set.version,Version,Versión,10,
-set.lang,Language,Idioma,12,
-set.lang.system,System default,Predeterminado del sistema,28,
-set.lang.system.help,Follows the phone language. English is the fallback.,"Sigue el idioma del teléfono. Si no es español, se usa inglés.",72,
-set.lang.en,English,English,10,language name stays in English
-set.lang.es,Español,Español,10,language name stays in Spanish
-first.lead,"Model probabilities for the week. This is an open ML experiment, not a recommendation.","Probabilidades del modelo para la semana. Esto es un experimento abierto de ML, no una recomendación.",110,
-first.cta,See the week,Ver la semana,20,
-off.nocache,You are offline and this phone has no saved data.,Estás sin conexión y no hay datos guardados en este teléfono.,72,
-cta.retry,Retry,Reintentar,12,
-ban.offline,No connection. Data from {dt}.,Sin conexión. Datos del {dt}.,48,
-ban.error,Couldn't update.,No se pudo actualizar.,28,
-ban.error.body,You are still seeing data from {dt}.,Sigues viendo los datos del {dt}.,48,
-snack.back,Back online. Updated.,De nuevo en línea. Actualizado.,32,
-alpha,Public Alpha,Public Alpha,14,"product name, not translated"
-wid.next,Next · {when},Próximo · {when},28,
-wid.updated,Updated {dt},Actualizado {dt},32,
-wid.empty,No games yet,Sin juegos todavía,24,
-wid.offline,Offline. Updated {dt}.,Sin conexión. Actualizado {dt}.,40,
-wid.offline.empty,No saved data.,Sin datos guardados.,24,one line under the wordmark
-wid.mono.note,"Themed, Android 12+","Temático, Android 12+",24,
-tb.cover,"According to the model, in 10 games like this, {team} win {n}.","Según el modelo, en 10 partidos como este, {team} gana {n}.",100,n = 5 to 9
-tb.cover.tossup,"According to the model, this is a toss-up. In 10 games like this, each side wins about 5.","Según el modelo, esto es un juego parejo. En 10 partidos como este, cada lado gana cerca de 5.",120,
-tb.cover.more9,"According to the model, in more than 9 of 10 games like this, {team} win.","Según el modelo, en más de 9 de cada 10 partidos como este, gana {team}.",110,
-tb.field,Probability field. The model gives {team} {pm} percent.,Campo de probabilidad. El modelo da a {team} un {pm} por ciento.,120,"named favorite, pm is pFav*100"
-tb.dumbbell,"Week {n}. Model log loss {mo}. Market log loss {mk}. The market is lower, which is better.","Semana {n}. Log loss del modelo {mo}. Del mercado {mk}. El mercado queda más bajo, que es mejor.",140,"mo, mk at 3 decimals, locale format"
-tb.dumbbell.none,Week {n}. No finals.,Semana {n}. Sin finales.,32,
-tb.widget,Next game: {away} at {home}. The model gives {team} {n} in 10. Updated {dt}. Double tap to open the game.,Próximo juego: {away} en {home}. El modelo da a {team} {n} de cada 10. Actualizado {dt}. Toca dos veces para abrir el juego.,180,
-tb.widget.empty,No games yet. Double tap to open the app.,Sin juegos todavía. Toca dos veces para abrir la app.,60,
-tb.widget.offline,Offline. Showing data updated {dt}. Double tap to open the app.,Sin conexión. Mostrando datos actualizados {dt}. Toca dos veces para abrir la app.,90,
-tb.week.row,{away} at {home}. {n} in 10 for {team}. {state}. Kickoff {when}.,{away} en {home}. {n} de cada 10 para {team}. {state}. Saque {when}.,140,
-tb.loading,Loading the week.,Cargando la semana.,24,
-detail.vals,{team} {pm} model,{team} {pm} modelo,28,"named favorite, same team as the cover figure; model only"
-wid.next.only,Next,Próximo,10,
-wid.offline.line,Offline · {dt},Sin conexión · {dt},36,"one line, do not split the time"
-wid.offline.short,Offline · {t},Sin conexión · {t},22,"2x2 kicker, time only, never wrap"
-wid.updated.short,Updated {t},Actualizado {t},20,"2x2 footer, time only"
-wid.cover,{n} in 10 {team},{n} de 10 {team},28,4x2 and 4x1; short name of the model favorite
-wid.cover.more9,More than 9 {team},Más de 9 {team},24,compact widget phrase plus short name
-logo.cd,{team} logo,Logo de {team},24,contentDescription when a logo is showing (placeholder or loaded)
-logo.cd.mono,{team},{team},16,contentDescription for the monogram fallback
-logo.cd.loading,"{team} logo, loading","Logo de {team}, cargando",32,
-logo.caption,team logo (runtime),logo del equipo (runtime),28,"annotation only, never inside the 24-32 dp slot"
+key,en,es,max,notes
+nav.week,Week,Semana,,
+nav.history,History,Historial,,
+nav.settings,Settings,Ajustes,,
+week.kicker,Week,Semana,,
+week.title,Week {n},Semana {n},,n = week number
+week.count,{n} games,{n} juegos,,"n = 14 to 16, plural in both"
+week.saved,Saved {dt},Guardado {dt},,dt = locale timestamp
+week.day,{weekday},{weekday},16,Locale weekday. type.kicker uppercases it.
+week.day.today,Today,Hoy,10,
+week.day.tomorrow,Tomorrow,Mañana,12,
+week.empty,This week has no published games.,Esta semana no tiene juegos publicados.,,
+week.choose,Choose a week,Elegir semana,,
+week.contract,Update the app to see this week.,Actualiza la app para ver esta semana.,,
+week.contract.body,The data contract changed and this version cannot read it.,El contrato de datos cambió y esta versión no puede leerlo.,,
+week.release,Go to the release,Ir al release,,
+chip.final,Final,Final,,
+chip.tie,Final · Tie,Final · Empate,,
+chip.live,In play,En juego,,
+chip.tossup,Toss-up,Juego parejo,,
+cover.in10,{n} in 10,{n} de cada 10,,"n is 5 to 9, never 10. Also used as ""in 10"" / ""de cada 10"" next to the figure."
+cover.in10.short,in 10,de 10,,row figure caption
+cover.tossup,Toss-up,Juego parejo,,
+cover.more9,More than 9 in 10,Más de 9 de cada 10,,
+cover.wins,{team} win,gana {team},,"team = named favorite. EN verb is ""win"" for the franchise name."
+cover.old,The model had {n} in 10 for {team}.,El modelo daba {n} de cada 10 a {team}.,,n = 5 to 9
+detail.localtime,PHONE LOCAL TIME,HORA DE ESTE TELÉFONO,,
+detail.livekicker,IN PLAY · PRE-KICKOFF PROBABILITY,EN JUEGO · PROBABILIDAD PREVIA AL SAQUE,,
+detail.model,MODEL,MODELO,,
+detail.near50,The model places this game near 50%.,El modelo sitúa este juego cerca de 50%.,,
+detail.dots,"In 10 games like this, {team} win {n}.","En 10 partidos como este, {team} gana {n}.",,n = 5 to 9
+detail.dots.tossup,"In 10 games like this, each side wins about 5. Toss-up.","En 10 partidos como este, cada lado gana cerca de 5. Juego parejo.",,
+detail.countdown,Starts in {d} d {h} h,Empieza en {d} d {h} h,,"d, h integers"
+detail.countdown.short,Starts in {h} h {m} m,Empieza en {h} h {m} min,32,Use when d = 0 and h >= 1
+detail.countdown.min,Starts in {m} min,Empieza en {m} min,24,Use when under 1 hour
+detail.footer,Open ML experiment. Not a recommendation.,Experimento abierto de ML. Esto no es una recomendación.,,
+how.honest,In 2026 the market has a lower log loss than the model. This is not a recommendation.,En 2026 el mercado tiene menor log loss que el modelo. Esto no es una recomendación.,,History and How it is calculated only
+how.cover,"The cover figure names the model favorite. pFav = max(p, 1-p). n is 5 to 9. Below 55 percent: Toss-up. From 95 percent: More than 9 in 10.","La cifra de portada nombra al favorito del modelo. pFav = max(p, 1-p). n va de 5 a 9. Por debajo de 55 por ciento: Juego parejo. Desde 95 por ciento: Más de 9 de cada 10.",,
+how.field,"The field shows only the model. The ring sits at x = 30 + 3p, with p for the home team. The label is the named favorite's probability.","El campo muestra solo el modelo. El anillo se coloca en x = 30 + 3p, con p del equipo local. La etiqueta es la probabilidad del favorito nombrado.",,
+detail.how,How it is calculated,Cómo se calcula,,
+detail.tie.note,A tie does not count in the log loss.,Un empate no cuenta en el log loss.,,
+detail.at,{away} at {home},{away} en {home},,"full names, up to 2 lines"
+detail.compact,{away} at {home},{away} en {home},,first word of each name
+field.visitor,Visitor,Visitante,,
+field.home,Home,Local,,
+hist.season,Season {y},Temporada {y},,
+hist.title,The market is better calibrated.,El mercado está mejor calibrado.,,
+hist.sub,Its log loss is lower. Lower is better.,Su log loss es más bajo. Más bajo es mejor.,,
+hist.sample,"{have} of {need} decided games, the contract threshold.","{have} de {need} juegos decididos, el umbral del contrato.",,example 29 of 48
+hist.weekly,Log loss by week · lower is better,Log loss por semana · menor es mejor,,
+hist.nofinals,No finals,Sin finales,,
+hist.calls,Correct calls,Aciertos,,
+hist.calls.n,{hits} of {n},{hits} de {n},,example 23 of 29
+hist.calls.note,On decided games this season.,En los juegos decididos de esta temporada.,,
+hist.ll,Log loss,Log loss,,
+hist.na,This season's history is not available yet.,El historial de esta temporada no está disponible todavía.,,
+hist.kicker,History,Historial,,
+set.title,Settings,Ajustes,,
+set.alert,Tuesday alert,Aviso del martes,,
+set.off,Off,Apagado,,
+set.on,On,Encendido,,
+set.theme,Theme,Tema,,
+set.theme.auto,Auto,Auto,,
+set.theme.dark,Dark,Oscuro,,
+set.theme.light,Light,Claro,,
+set.cache,Saved data,Datos guardados,,
+set.clear,Clear,Borrar,,
+set.cache.when,Saved {dt},Guardado {dt},36,dt = locale timestamp
+set.cache.cleared,Cleared,Borrado,10,
+set.cache.empty,No saved data,Sin datos guardados,20,
+set.about,About,Acerca,,
+set.about.body,Open ML experiment. Not a recommendation.,Experimento abierto de ML. Esto no es una recomendación.,,
+set.version,Version,Versión,,
+set.lang,Language,Idioma,,
+set.lang.system,System default,Predeterminado del sistema,,
+set.lang.system.help,Follows the phone language. English is the fallback.,"Sigue el idioma del teléfono. Si no es español, se usa inglés.",,
+set.lang.en,English,English,,language name stays in English
+set.lang.es,Español,Español,,language name stays in Spanish
+first.lead,"Model probabilities for the week. This is an open ML experiment, not a recommendation.","Probabilidades del modelo para la semana. Esto es un experimento abierto de ML, no una recomendación.",,
+first.cta,See the week,Ver la semana,,
+off.nocache,You are offline and this phone has no saved data.,Estás sin conexión y no hay datos guardados en este teléfono.,,
+cta.retry,Retry,Reintentar,,
+ban.offline,No connection. Data from {dt}.,Sin conexión. Datos del {dt}.,,
+ban.error,Couldn't update.,No se pudo actualizar.,,
+ban.error.body,You are still seeing data from {dt}.,Sigues viendo los datos del {dt}.,,
+snack.back,Back online. Updated.,De nuevo en línea. Actualizado.,,
+alpha,Public Alpha,Public Alpha,,"product name, not translated"
+wid.next,Next · {when},Próximo · {when},,
+wid.updated,Updated {dt},Actualizado {dt},,
+wid.empty,No games yet,Sin juegos todavía,,
+wid.offline,Offline. Updated {dt}.,Sin conexión. Actualizado {dt}.,,
+wid.offline.empty,No saved data.,Sin datos guardados.,,one line under the wordmark
+wid.mono.note,"Themed, Android 12+","Temático, Android 12+",,
+tb.cover,"According to the model, in 10 games like this, {team} win {n}.","Según el modelo, en 10 partidos como este, {team} gana {n}.",,n = 5 to 9
+tb.cover.tossup,"According to the model, this is a toss-up. In 10 games like this, each side wins about 5.","Según el modelo, esto es un juego parejo. En 10 partidos como este, cada lado gana cerca de 5.",,
+tb.cover.more9,"According to the model, in more than 9 of 10 games like this, {team} win.","Según el modelo, en más de 9 de cada 10 partidos como este, gana {team}.",,
+tb.field,Probability field. The model gives {team} {pm} percent.,Campo de probabilidad. El modelo da a {team} un {pm} por ciento.,,"named favorite, pm is pFav*100"
+tb.dumbbell,"Week {n}. Model log loss {mo}. Market log loss {mk}. The market is lower, which is better.","Semana {n}. Log loss del modelo {mo}. Del mercado {mk}. El mercado queda más bajo, que es mejor.",,"mo, mk at 3 decimals, locale format"
+tb.dumbbell.none,Week {n}. No finals.,Semana {n}. Sin finales.,,
+tb.widget,Next game: {away} at {home}. The model gives {team} {n} in 10. Updated {dt}. Double tap to open the game.,Próximo juego: {away} en {home}. El modelo da a {team} {n} de cada 10. Actualizado {dt}. Toca dos veces para abrir el juego.,,
+tb.widget.empty,No games yet. Double tap to open the app.,Sin juegos todavía. Toca dos veces para abrir la app.,,
+tb.widget.offline,Offline. Showing data updated {dt}. Double tap to open the app.,Sin conexión. Mostrando datos actualizados {dt}. Toca dos veces para abrir la app.,,
+tb.week.row,{away} at {home}. {n} in 10 for {team}. {state}. Kickoff {when}.,{away} en {home}. {n} de cada 10 para {team}. {state}. Saque {when}.,,
+tb.loading,Loading the week.,Cargando la semana.,,
+detail.vals,{team} {pm} model,{team} {pm} modelo,,"named favorite, same team as the cover figure; model only"
+wid.next.only,Next,Próximo,,
+wid.offline.line,Offline · {dt},Sin conexión · {dt},,"one line, do not split the time"
+wid.offline.short,Offline · {t},Sin conexión · {t},,"2x2 kicker, time only, never wrap"
+wid.updated.short,Updated {t},Actualizado {t},,"2x2 footer, time only"
+wid.cover,{n} in 10 {team},{n} de 10 {team},,4x2 and 4x1; short name of the model favorite
+wid.cover.more9,More than 9 {team},Más de 9 {team},,compact widget phrase plus short name
+logo.cd,{team} logo,Logo de {team},,contentDescription when a logo is showing (placeholder or loaded)
+logo.cd.mono,{team},{team},,contentDescription for the monogram fallback
+logo.cd.loading,"{team} logo, loading","Logo de {team}, cargando",,
+logo.caption,team logo (runtime),logo del equipo (runtime),,"annotation only, never inside the 24-32 dp slot"

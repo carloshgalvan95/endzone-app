@@ -1,4 +1,6 @@
 // tokens.ts, híbrido H2.1 de endzone-app, sprint 3.
+// QA r2 (18 nov 2026, America/Mexico_City): contrastLight, space,
+// rhythm, themePref, reducedMotion, light fieldTick and light tints.
 // Listo para pegar o extender src/theme/tokens.ts en Expo 58 / RN 0.88.
 // Incorpora la escala de la auditoría de Idaho (sección 5) y la regla
 // de la cifra de portada (M2). Paleta del kit DARK sin cambios de hex.
@@ -87,6 +89,55 @@ export const type = {
 
 export const pagePad = 16;
 
+// All padding and gaps snap to this 4 dp scale.
+export const space = {
+  xxs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+  xxxl: 64,
+} as const;
+
+// Vertical rhythm targets (QA r2). Use these instead of leftover 7, 12.5, 39, 40 dp gaps.
+export const rhythm = {
+  week: {
+    padX: 16,
+    mastheadPadTop: 16,
+    rowKickerGap: 8,
+    namesToField: 8,
+    fieldToNext: 16,
+    dayHeaderGapAbove: 16,
+    dayHeaderGapBelow: 8,
+    rowMinHeight: 132,
+  },
+  detail: {
+    bar: 64,
+    padX: 16,
+    afterBar: 16,
+    kickerToDate: 8,
+    dateToTitle: 16,
+    titleToCover: 16,
+    in10ToWins: 8,
+    winsToFieldLabels: 16,
+    labelsToField: 8,
+    fieldToVals: 12,
+    valsToDots: 8,
+    dotsToPhrase: 8,
+    phraseToFooter: 16,
+    footerToLink: 8,
+    afterLink: 24,
+  },
+} as const;
+
+export const themePref = {
+  default: 'system' as const,
+  options: ['system', 'light', 'dark'] as const,
+  storageKey: 'theme.pref',
+} as const;
+
 // Cifra de portada. Nunca se recorta. Nunca escala con el sistema.
 // Sidebearings izquierdos de Jost 700 a 168 sp, medidos con PIL sobre
 // el trazo (no el bbox): 5=7, 6=8, 7=5, 8=9, 9=8 dp, todos positivos.
@@ -174,11 +225,18 @@ export function typeStyle(
 
 export const motion = {
   duration: { sm: 120, md: 200, lg: 320 },
-  easing: { standard: [0.2, 0, 0, 1] as const },
+  easing: { standard: [0.2, 0, 0, 1] as const }, // cubic-bezier(0.2, 0, 0, 1)
   stagger: 30, // ms, primeras 6 filas
   // Solo formas de marca en primer uso, vacío y offline sin caché.
+  // Nunca en cifras (portada, fila, porcentajes, cuenta atrás): sin bounce.
   springShape: { damping: 16, stiffness: 180, mass: 1, overshootClamping: false },
   heroCollapseScroll: { start: 0, compactFrom: 80, compactVisible: 120 },
+  // Colapso: transform (translateY / scale), no fontSize. El contenido se queda.
+  reducedMotion: {
+    duration: { sm: 1, md: 1, lg: 1 },
+    disableSpring: true,
+    keepContent: true,
+  },
 } as const;
 
 export const hitSlop = { min: 48 } as const;
@@ -254,10 +312,15 @@ export const lightPalette = {
   scoreMuted: '#5E5950',
   bannerBg: '#E8E0CC',
   bannerBorder: '#AE2440',
-  crimsonHero: '#AE2440',
+  crimsonHero: '#AE2440', // cream on this 5.80 AA. Do not put ink on the end zone.
   playField: '#E8E0CC',
-  fieldTick: '#D9D1BD',
+  fieldTick: '#BAB3A4', // ink 22% on playField, 1.59:1, texture only
   fieldCap: '#D9D1BD',
+  // Light tints, counterparts of the dark blueDeep / crimsonDeep / glass.
+  blueDeep: '#D5DEEE',
+  crimsonDeep: '#F0D4DA',
+  blueSoft: '#3E68B0', // 4.76 on cream (AA). 4.19 on surface: not body on surface.
+  glass: '#EFE8D6',
 } as const;
 
 export const contrastDark = {
@@ -276,6 +339,22 @@ export const contrastDark = {
   fieldTickOnPlayField: 1.72, // no cumple 3:1; solo textura
   cream25OnPlayField: 2.13, // filete del campo, no es el dato
   cream60OnPlayField: 6.18, // línea de 50%
+} as const;
+
+// Light theme, same WCAG 2 formula. 50% line uses textMuted on playField.
+export const contrastLight = {
+  inkOnBg: 15.78,
+  inkOnSurface: 13.88,
+  mutedOnBg: 6.01,
+  mutedOnSurface: 5.29,
+  modelOnBg: 6.75,
+  modelOnSurface: 5.94,
+  modelOnPlayField: 5.94,
+  creamOnCrimsonHero: 5.80,
+  inkOnCream: 15.78,
+  inkOnYellow: 9.41,
+  fieldTickOnPlayField: 1.59, // texture only, same role as dark 1.72
+  mutedOnPlayField: 5.29, // 50% line in light
 } as const;
 
 export const hapticEvents = {
