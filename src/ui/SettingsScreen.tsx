@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
+import { useQueryClient } from '@tanstack/react-query';
 
+import { clearSavedData, readCacheSavedAt } from '@/data/QueryProvider';
 import {
   disableTuesdayAlert,
   enableTuesdayAlert,
@@ -10,21 +12,31 @@ import {
 } from '@/features/notifications/tuesday';
 import { useI18n } from '@/i18n/LocaleProvider';
 import type { LocalePreference } from '@/i18n';
-import { darkPalette, font, langOption, nav } from '@/theme/h2';
-import { useTheme } from '@/theme/ThemeProvider';
+import { font, langOption, nav, opacity, rhythm } from '@/theme/h2';
+import { useH2Theme, useTheme } from '@/theme/ThemeProvider';
+import type { ThemePreference } from '@/theme/resolveTheme';
 
 import { BottomNav } from './Chrome';
+import { hapticSwitch } from './haptics';
+import { formatLocalWhen } from './weekModel';
 
 export function SettingsScreen() {
-  const { t, preference, setPreference } = useI18n();
+  const { t, preference, setPreference, locale } = useI18n();
   const theme = useTheme();
+  const { palette, preference: themePreference, setPreference: setThemePreference } = useH2Theme();
   const insets = useSafeAreaInsets();
+  const client = useQueryClient();
   const [alertOn, setAlertOn] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [cacheNote, setCacheNote] = useState<string | null>(null);
 
   useEffect(() => {
     readTuesdayAlertEnabled()
       .then(setAlertOn)
+      .catch(() => undefined);
+    readCacheSavedAt()
+      .then(setSavedAt)
       .catch(() => undefined);
   }, []);
 
@@ -35,7 +47,7 @@ export function SettingsScreen() {
   ];
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: palette.bg }]}>
       <ScrollView
         style={styles.list}
         contentContainerStyle={{
@@ -45,8 +57,8 @@ export function SettingsScreen() {
           gap: 16,
         }}
       >
-        <Text style={styles.title}>{t('set.title')}</Text>
-        <Text style={styles.kicker}>{t('set.lang')}</Text>
+        <Text style={[styles.title, { color: palette.text }]}>{t('set.title')}</Text>
+        <Text style={[styles.kicker, { color: palette.textMuted }]}>{t('set.lang')}</Text>
         {options.map((option) => {
           const selected = preference === option.id;
           return (
@@ -57,14 +69,88 @@ export function SettingsScreen() {
               onPress={() => setPreference(option.id)}
               style={styles.option}
             >
-              <View style={[styles.radio, selected ? styles.radioOn : null]} />
-              <Text style={styles.body}>{option.label}</Text>
+              <View
+                style={[
+                  styles.radio,
+                  { borderColor: palette.textMuted },
+                  selected ? { backgroundColor: palette.text, borderColor: palette.text } : null,
+                ]}
+              />
+              <Text style={[styles.body, { color: palette.text }]}>{option.label}</Text>
             </Pressable>
           );
         })}
-        <Text style={styles.muted}>{t('set.lang.system.help')}</Text>
+        <Text style={[styles.muted, { color: palette.textMuted }]}>
+          {t('set.lang.system.help')}
+        </Text>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: rhythm.week.padX }]}>
+          {t('set.theme')}
+        </Text>
+        {(
+          [
+            ['system', t('set.theme.auto')],
+            ['dark', t('set.theme.dark')],
+            ['light', t('set.theme.light')],
+          ] as const
+        ).map(([id, label]) => {
+          const selected = themePreference === id;
+          return (
+            <Pressable
+              key={id}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              onPress={() => setThemePreference(id as ThemePreference)}
+              style={({ pressed }) => [
+                styles.option,
+                pressed ? { opacity: opacity.pressed } : null,
+              ]}
+            >
+              <View
+                style={[
+                  styles.radio,
+                  { borderColor: palette.textMuted },
+                  selected ? { backgroundColor: palette.text, borderColor: palette.text } : null,
+                ]}
+              />
+              <Text style={[styles.body, { color: palette.text }]}>{label}</Text>
+            </Pressable>
+          );
+        })}
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: rhythm.week.padX }]}>
+          {t('set.cache')}
+        </Text>
         <View style={styles.row}>
-          <Text style={styles.body}>{t('set.alert')}</Text>
+          <Text style={[styles.kicker, { color: palette.textMuted, flex: 1 }]}>
+            {cacheNote ??
+              (savedAt
+                ? t('set.cache.when', {
+                    dt: formatLocalWhen(new Date(savedAt).toISOString(), locale),
+                  })
+                : t('set.cache.empty'))}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            disabled={savedAt == null}
+            onPress={() => {
+              client.clear();
+              clearSavedData()
+                .then(() => {
+                  setSavedAt(null);
+                  setCacheNote(t('set.cache.cleared'));
+                })
+                .catch(() => undefined);
+            }}
+            style={styles.clear}
+          >
+            <Text
+              style={[styles.body, { color: savedAt == null ? palette.textMuted : palette.text }]}
+            >
+              {t('set.clear')}
+            </Text>
+          </Pressable>
+        </View>
+        <View style={styles.row}>
+          <Text style={[styles.body, { color: palette.text }]}>{t('set.alert')}</Text>
           <Switch
             accessibilityLabel={t('set.alert')}
             value={alertOn}
@@ -72,6 +158,7 @@ export function SettingsScreen() {
               if (!next) {
                 disableTuesdayAlert()
                   .then(() => {
+                    hapticSwitch(false).catch(() => undefined);
                     setAlertOn(false);
                     setNote(null);
                   })
@@ -80,19 +167,26 @@ export function SettingsScreen() {
               }
               enableTuesdayAlert()
                 .then((result) => {
+                  if (result === 'enabled') {
+                    hapticSwitch(true).catch(() => undefined);
+                  }
                   setAlertOn(result === 'enabled');
                   setNote(result === 'denied' ? t('off.nocache') : null);
                 })
                 .catch(() => undefined);
             }}
-            trackColor={{ true: theme.color.brand, false: darkPalette.border }}
+            trackColor={{ true: theme.color.brand, false: palette.border }}
           />
         </View>
-        <Text style={styles.muted}>{alertOn ? t('set.on') : t('set.off')}</Text>
-        {note ? <Text style={styles.muted}>{note}</Text> : null}
-        <Text style={styles.kicker}>{t('set.version')}</Text>
-        <Text style={styles.body}>{Constants.expoConfig?.version ?? '0.3.0'}</Text>
-        <Text style={styles.body}>{t('set.about.body')}</Text>
+        <Text style={[styles.muted, { color: palette.textMuted }]}>
+          {alertOn ? t('set.on') : t('set.off')}
+        </Text>
+        {note ? <Text style={[styles.muted, { color: palette.textMuted }]}>{note}</Text> : null}
+        <Text style={[styles.kicker, { color: palette.textMuted }]}>{t('set.version')}</Text>
+        <Text style={[styles.body, { color: palette.text }]}>
+          {Constants.expoConfig?.version ?? '0.3.0'}
+        </Text>
+        <Text style={[styles.body, { color: palette.text }]}>{t('set.about.body')}</Text>
       </ScrollView>
       <BottomNav />
     </View>
@@ -100,27 +194,27 @@ export function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: darkPalette.bg },
+  screen: { flex: 1 },
   list: { flex: 1 },
-  title: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 32, lineHeight: 36 },
+  title: { fontFamily: font.sansBold, fontSize: 32, lineHeight: 36 },
   kicker: {
-    color: darkPalette.textMuted,
     fontFamily: font.monoMedium,
     fontSize: 12,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  body: { color: darkPalette.text, fontFamily: font.sans, fontSize: 16, lineHeight: 24, flex: 1 },
-  muted: { color: darkPalette.textMuted, fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
+  body: { fontFamily: font.sans, fontSize: 16, lineHeight: 24, flex: 1 },
+  muted: { fontFamily: font.sans, fontSize: 14, lineHeight: 20 },
+  clear: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 8 },
   option: { minHeight: langOption.minHeight, flexDirection: 'row', alignItems: 'center', gap: 12 },
   radio: {
     width: langOption.radio,
     height: langOption.radio,
     borderRadius: langOption.radio / 2,
     borderWidth: 2,
-    borderColor: darkPalette.textMuted,
+    borderColor: 'transparent',
   },
-  radioOn: { backgroundColor: darkPalette.text, borderColor: darkPalette.text },
+  radioOn: {},
   row: {
     minHeight: 48,
     flexDirection: 'row',

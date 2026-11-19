@@ -9,10 +9,36 @@ import { createAppQueryClient } from './queryClient';
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
+export const QUERY_CACHE_KEY = 'endzone-query-cache-v1';
+
 const persister = createAsyncStoragePersister({
   storage: AsyncStorage,
-  key: 'endzone-query-cache-v1',
+  key: QUERY_CACHE_KEY,
 });
+
+export async function readCacheSavedAt(): Promise<number | null> {
+  const raw = await AsyncStorage.getItem(QUERY_CACHE_KEY);
+  if (!raw) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(raw) as { timestamp?: number };
+    return typeof parsed.timestamp === 'number' ? parsed.timestamp : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function clearSavedData(): Promise<void> {
+  await persister.removeClient();
+  const keys = await AsyncStorage.getAllKeys();
+  const drop = keys.filter(
+    (key) => key.startsWith('endzone-logo-') || key === 'endzone-widget-slate',
+  );
+  if (drop.length > 0) {
+    await AsyncStorage.multiRemove(drop);
+  }
+}
 
 let onlineBound = false;
 

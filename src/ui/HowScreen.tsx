@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useI18n } from '@/i18n/LocaleProvider';
-import { darkPalette, font } from '@/theme/h2';
+import { font } from '@/theme/h2';
+import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { TopBar } from './Chrome';
 
@@ -13,8 +14,9 @@ export function HowScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [compact, setCompact] = useState(false);
+  const { palette } = useH2Theme();
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: palette.bg }]}>
       <TopBar onBack={() => router.back()} title={t('detail.how')} showTitle={compact} />
       <ScrollView
         style={styles.list}
@@ -26,18 +28,18 @@ export function HowScreen() {
           gap: 16,
         }}
       >
-        <Text style={styles.title}>{t('detail.how')}</Text>
-        <Text style={styles.body}>{t('how.cover')}</Text>
-        <Text style={styles.body}>{t('how.field')}</Text>
-        <Text style={styles.body}>{t('how.honest')}</Text>
+        <Text style={[styles.title, { color: palette.text }]}>{t('detail.how')}</Text>
+        <Text style={[styles.body, { color: palette.text }]}>{t('how.cover')}</Text>
+        <Text style={[styles.body, { color: palette.text }]}>{t('how.field')}</Text>
+        <Text style={[styles.body, { color: palette.text }]}>{t('how.honest')}</Text>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: darkPalette.bg },
+  screen: { flex: 1 },
   list: { flex: 1 },
-  title: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 32, lineHeight: 36 },
-  body: { color: darkPalette.text, fontFamily: font.sans, fontSize: 16, lineHeight: 24 },
+  title: { fontFamily: font.sansBold, fontSize: 32, lineHeight: 36 },
+  body: { fontFamily: font.sans, fontSize: 16, lineHeight: 24 },
 });

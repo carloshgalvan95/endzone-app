@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
-import { darkPalette, nav } from '@/theme/h2';
+import { nav } from '@/theme/h2';
+import { useH2Theme } from '@/theme/ThemeProvider';
 
 type IconProps = { color: string; active?: boolean };
 
@@ -17,16 +18,18 @@ export function WeekIcon({ color }: IconProps) {
 export function HistoryIcon({ color }: IconProps) {
   return (
     <View style={styles.box}>
-      <View style={[styles.clock, { borderColor: color }]}>
-        <View style={[styles.handV, { backgroundColor: color }]} />
-        <View style={[styles.handH, { backgroundColor: color }]} />
+      <View style={styles.bars}>
+        <View style={[styles.bar, { height: 8, borderColor: color }]} />
+        <View style={[styles.bar, { height: 14, borderColor: color }]} />
+        <View style={[styles.bar, { height: 11, borderColor: color }]} />
       </View>
     </View>
   );
 }
 
 export function SettingsIcon({ color, active = false }: IconProps) {
-  const hole = active ? darkPalette.text : darkPalette.bg;
+  const { palette } = useH2Theme();
+  const hole = active ? palette.text : palette.bg;
   return (
     <View style={styles.box}>
       {[0, 60, 120].map((deg) => (
@@ -63,20 +66,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   calendarHead: { height: 4 },
-  clock: {
-    width: 18,
+  bars: {
+    width: 22,
     height: 18,
-    borderRadius: 9,
-    borderWidth: 1.5,
-    alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
-  handV: { position: 'absolute', width: 1.5, height: 6, top: 3, left: 7.5 },
-  handH: { position: 'absolute', width: 5, height: 1.5, top: 8, left: 7.5 },
+  bar: { width: 5, borderWidth: 2 },
   tooth: { position: 'absolute', width: 2, height: 22 },
   gearHole: { width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },
   chevron: {
-    width: 10,
-    height: 10,
+    width: 16,
+    height: 16,
     borderLeftWidth: 2,
     borderBottomWidth: 2,
     transform: [{ rotate: '45deg' }],

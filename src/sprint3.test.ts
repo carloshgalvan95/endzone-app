@@ -6,6 +6,8 @@ import { resolveLocale } from '@/i18n/resolve';
 import { en, es, stringKeys } from '@/i18n/catalog';
 import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { fieldMarkerX, fieldX } from '@/slate/field';
+import { countdownCopy, dayBucket, groupByLocalDay } from '@/ui/schedule';
+import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { coverFromHomeProb } from '@/theme/h2';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
@@ -63,12 +65,12 @@ describe('i18n catalog', () => {
       .slice(1)
       .map((line) => line.split(',')[0] ?? '')
       .filter((key) => key.length > 0);
-    expect(keys.length).toBe(106);
+    expect(keys.length).toBe(114);
     for (const key of keys) {
       expect(en[key as keyof typeof en]?.length).toBeGreaterThan(0);
       expect(es[key as keyof typeof es]?.length).toBeGreaterThan(0);
     }
-    expect(stringKeys).toHaveLength(106);
+    expect(stringKeys).toHaveLength(114);
     expect(resolveLocale('system', 'es-MX')).toBe('es');
     expect(resolveLocale('system', 'en-US')).toBe('en');
     expect(resolveLocale('en', 'es')).toBe('en');
@@ -94,6 +96,49 @@ describe('logo fallback', () => {
       'monogram',
     );
     expect(monogramLetters('nyg', 'Giants')).toBe('NYG');
+  });
+});
+
+describe('theme, countdown, and motion', () => {
+  test('keeps an explicit theme and follows the phone on auto', () => {
+    expect(resolveThemePreference('light', 'dark')).toBe('light');
+    expect(resolveThemePreference('dark', 'light')).toBe('dark');
+    expect(resolveThemePreference('system', 'light')).toBe('light');
+    expect(resolveThemePreference('system', null)).toBe('dark');
+  });
+
+  test('formats the countdown in days, hours, and minutes', () => {
+    expect(countdownCopy(26 * 60 * 60 * 1000)).toEqual({
+      key: 'detail.countdown',
+      vars: { d: 1, h: 2 },
+    });
+    expect(countdownCopy(3 * 60 * 60 * 1000 + 5 * 60 * 1000)).toEqual({
+      key: 'detail.countdown.short',
+      vars: { h: 3, m: 5 },
+    });
+    expect(countdownCopy(12 * 60 * 1000)?.key).toBe('detail.countdown.min');
+    expect(countdownCopy(0)).toBeNull();
+  });
+
+  test('groups kickoffs into today, tomorrow, and a later weekday', () => {
+    const now = Date.parse('2026-11-20T15:00:00');
+    expect(dayBucket(Date.parse('2026-11-20T23:00:00'), now)).toBe('today');
+    expect(dayBucket(Date.parse('2026-11-21T01:00:00'), now)).toBe('tomorrow');
+    const groups = groupByLocalDay(
+      [
+        { kickoff: '2026-11-20T18:00:00' },
+        { kickoff: '2026-11-21T18:00:00' },
+        { kickoff: '2026-11-22T18:00:00' },
+      ],
+      now,
+    );
+    expect(groups.map((group) => group.bucket)).toEqual(['today', 'tomorrow', 'weekday']);
+  });
+
+  test('snaps motion to 1 ms when reduce motion is on', () => {
+    expect(motionDuration('lg', false)).toBe(320);
+    expect(motionDuration('sm', true)).toBe(1);
+    expect(motionDuration('md', true)).toBe(1);
   });
 });
 

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
-import { coverFromHomeProb, coverFigure, darkPalette, font } from '@/theme/h2';
+import { coverFromHomeProb, coverFigure, font, rhythm } from '@/theme/h2';
+import { useH2Theme } from '@/theme/ThemeProvider';
 import { useI18n } from '@/i18n/LocaleProvider';
 
 type CoverFigureProps = {
@@ -11,6 +12,7 @@ type CoverFigureProps = {
 
 export function CoverFigure({ pHome, favorite, fontScale }: CoverFigureProps) {
   const { t } = useI18n();
+  const { palette } = useH2Theme();
   const windowScale = useWindowDimensions().fontScale || 1;
   const scale = fontScale ?? windowScale;
   const cover = coverFromHomeProb(pHome);
@@ -29,15 +31,30 @@ export function CoverFigure({ pHome, favorite, fontScale }: CoverFigureProps) {
         : t('tb.cover', { team: favorite, n: cover.n });
 
   return (
-    <View accessibilityLabel={talk} style={[styles.row, stacked ? styles.stack : null]}>
+    <View accessibilityLabel={talk}>
+      <View style={[styles.row, stacked ? styles.stack : null]}>
+        {cover.phrase === 'in 10' ? (
+          <Text
+            allowFontScaling={false}
+            maxFontSizeMultiplier={1}
+            style={[styles.figure, { color: palette.text }]}
+          >
+            {cover.n}
+          </Text>
+        ) : null}
+        <Text maxFontSizeMultiplier={1.5} style={[styles.phrase, { color: palette.text }]}>
+          {cover.phrase === 'in 10' ? t('cover.in10.short') : phrase}
+        </Text>
+      </View>
       {cover.phrase === 'in 10' ? (
-        <Text allowFontScaling={false} maxFontSizeMultiplier={1} style={styles.figure}>
-          {cover.n}
+        <Text
+          maxFontSizeMultiplier={1.5}
+          numberOfLines={1}
+          style={[styles.wins, { color: palette.text, marginTop: rhythm.detail.in10ToWins }]}
+        >
+          {t('cover.wins', { team: favorite })}
         </Text>
       ) : null}
-      <Text maxFontSizeMultiplier={1.5} style={styles.phrase}>
-        {cover.phrase === 'in 10' ? t('cover.in10.short') : phrase}
-      </Text>
     </View>
   );
 }
@@ -53,7 +70,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   figure: {
-    color: darkPalette.text,
     fontFamily: font.sansBold,
     fontSize: coverFigure.size,
     lineHeight: coverFigure.size,
@@ -61,10 +77,13 @@ const styles = StyleSheet.create({
     marginLeft: coverFigure.marginLeft,
   },
   phrase: {
-    color: darkPalette.text,
     fontFamily: font.sansMedium,
     fontSize: 18,
     lineHeight: 24,
-    paddingBottom: 18,
+  },
+  wins: {
+    fontFamily: font.sansMedium,
+    fontSize: 18,
+    lineHeight: 24,
   },
 });

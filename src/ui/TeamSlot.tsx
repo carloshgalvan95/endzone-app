@@ -6,7 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { teamLogos } from '@/config/features';
 import { useI18n } from '@/i18n/LocaleProvider';
 import { logoCacheKey, monogramLetters, resolveLogoStep } from '@/logos/resolve';
-import { darkPalette, font } from '@/theme/h2';
+import { font } from '@/theme/h2';
+import { useH2Theme } from '@/theme/ThemeProvider';
 
 type TeamSlotProps = {
   name: string;
@@ -20,6 +21,7 @@ type CacheEntry = { url: string; savedAt: number };
 
 export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
   const { t } = useI18n();
+  const { palette } = useH2Theme();
   const [networkFailed, setNetworkFailed] = useState(false);
   const [cached, setCached] = useState<CacheEntry | null>(null);
   const [now] = useState(() => Date.now());
@@ -63,8 +65,9 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: showImage ? 'transparent' : darkPalette.surface,
-          borderColor: color ?? darkPalette.borderStrong,
+          backgroundColor: showImage ? 'transparent' : palette.surface,
+          borderColor: color ?? palette.borderStrong,
+          flexShrink: 0,
           borderWidth: showImage ? 0 : 1.5,
         },
       ]}
@@ -72,7 +75,7 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
       {showImage && logoUrl ? (
         <Image
           source={{ uri: logoUrl }}
-          style={{ width: size - 4, height: size - 4 }}
+          style={{ width: size, height: size }}
           contentFit="contain"
           onLoad={() => {
             const entry = { url: logoUrl, savedAt: Date.now() };
@@ -86,7 +89,7 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
         <Text
           maxFontSizeMultiplier={1}
           style={{
-            color: darkPalette.text,
+            color: palette.text,
             fontFamily: font.sansBold,
             fontSize: size >= 32 ? 10 : 8,
           }}

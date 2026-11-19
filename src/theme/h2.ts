@@ -17,6 +17,52 @@ export const space = {
   6: 32,
   7: 48,
   8: 64,
+  xxs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+  xxxl: 64,
+} as const;
+
+export const pagePad = 16;
+
+export const rhythm = {
+  week: {
+    padX: 16,
+    mastheadPadTop: 16,
+    rowKickerGap: 8,
+    namesToField: 8,
+    fieldToNext: 16,
+    dayHeaderGapAbove: 16,
+    dayHeaderGapBelow: 8,
+    rowMinHeight: 132,
+  },
+  detail: {
+    bar: 64,
+    padX: 16,
+    afterBar: 16,
+    kickerToDate: 8,
+    dateToTitle: 16,
+    titleToCover: 16,
+    in10ToWins: 8,
+    winsToFieldLabels: 16,
+    labelsToField: 8,
+    fieldToVals: 12,
+    valsToDots: 8,
+    dotsToPhrase: 8,
+    phraseToFooter: 16,
+    footerToLink: 8,
+    afterLink: 24,
+  },
+} as const;
+
+export const themePref = {
+  default: 'system' as const,
+  options: ['system', 'light', 'dark'] as const,
+  storageKey: 'theme.pref',
 } as const;
 
 export const radius = {
@@ -240,8 +286,6 @@ export const type = {
   },
 } as const satisfies Record<string, TypeToken>;
 
-export const pagePad = 16;
-
 // Cifra de portada. Nunca se recorta. Nunca escala con el sistema.
 // Sidebearings izquierdos de Jost 700 a 168 sp, medidos con PIL sobre
 // el trazo (no el bbox): 5=7, 6=8, 7=5, 8=9, 9=8 dp, todos positivos.
@@ -331,6 +375,11 @@ export const motion = {
   // Solo formas de marca en primer uso, vacío y offline sin caché.
   springShape: { damping: 16, stiffness: 180, mass: 1, overshootClamping: false },
   heroCollapseScroll: { start: 0, compactFrom: 80, compactVisible: 120 },
+  reducedMotion: {
+    duration: { sm: 1, md: 1, lg: 1 },
+    disableSpring: true,
+    keepContent: true,
+  },
 } as const;
 
 export const hitSlop = { min: 48 } as const;
@@ -408,8 +457,27 @@ export const lightPalette = {
   bannerBorder: '#AE2440',
   crimsonHero: '#AE2440',
   playField: '#E8E0CC',
-  fieldTick: '#D9D1BD',
+  fieldTick: '#BAB3A4',
   fieldCap: '#D9D1BD',
+  blueDeep: '#D5DEEE',
+  crimsonDeep: '#F0D4DA',
+  blueSoft: '#3E68B0',
+  glass: '#EFE8D6',
+} as const;
+
+export const contrastLight = {
+  inkOnBg: 15.78,
+  inkOnSurface: 13.88,
+  mutedOnBg: 6.01,
+  mutedOnSurface: 5.29,
+  modelOnBg: 6.75,
+  modelOnSurface: 5.94,
+  modelOnPlayField: 5.94,
+  creamOnCrimsonHero: 5.8,
+  inkOnCream: 15.78,
+  inkOnYellow: 9.41,
+  fieldTickOnPlayField: 1.59,
+  mutedOnPlayField: 5.29,
 } as const;
 
 export const contrastDark = {
