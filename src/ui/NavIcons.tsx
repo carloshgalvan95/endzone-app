@@ -29,7 +29,7 @@ export function HistoryIcon({ color }: IconProps) {
 
 export function SettingsIcon({ color, active = false }: IconProps) {
   const { palette } = useH2Theme();
-  const hole = active ? palette.text : palette.bg;
+  const hole = active ? palette.accentNav : palette.bg;
   return (
     <View style={styles.box}>
       {[0, 60, 120].map((deg) => (

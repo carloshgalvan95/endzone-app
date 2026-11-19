@@ -8,7 +8,8 @@ import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { fieldMarkerX, fieldX } from '@/slate/field';
 import { countdownCopy, dayBucket, groupByLocalDay } from '@/ui/schedule';
 import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
-import { coverFromHomeProb } from '@/theme/h2';
+import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
+import { howLiveBindings } from '@/ui/howBindings';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
 import { widgetMark } from '@/widget/mark';
@@ -65,12 +66,12 @@ describe('i18n catalog', () => {
       .slice(1)
       .map((line) => line.split(',')[0] ?? '')
       .filter((key) => key.length > 0);
-    expect(keys.length).toBe(114);
+    expect(keys.length).toBe(191);
     for (const key of keys) {
       expect(en[key as keyof typeof en]?.length).toBeGreaterThan(0);
       expect(es[key as keyof typeof es]?.length).toBeGreaterThan(0);
     }
-    expect(stringKeys).toHaveLength(114);
+    expect(stringKeys).toHaveLength(191);
     expect(resolveLocale('system', 'es-MX')).toBe('es');
     expect(resolveLocale('system', 'en-US')).toBe('en');
     expect(resolveLocale('en', 'es')).toBe('en');
@@ -96,6 +97,62 @@ describe('logo fallback', () => {
       'monogram',
     );
     expect(monogramLetters('nyg', 'Giants')).toBe('NYG');
+  });
+});
+
+describe('strip lanes and week field', () => {
+  test('keeps every ring and separates a dense strip', () => {
+    const packed = Array.from({ length: 8 }, (_, index) => ({
+      id: `g${index}`,
+      x: 180 + index * 4,
+      kickoff: index,
+    }));
+    const placed = assignStripLanes(packed);
+    expect(Object.keys(placed.lanes)).toHaveLength(8);
+    expect(placed.diameter).toBeLessThanOrEqual(16);
+    const byLane: Record<number, number[]> = {};
+    for (const lane of Object.values(placed.lanes)) {
+      const bucket = byLane[lane.y] ?? [];
+      bucket.push(lane.x);
+      byLane[lane.y] = bucket;
+    }
+    for (const xs of Object.values(byLane)) {
+      const sorted = [...xs].sort((a, b) => a - b);
+      for (let index = 1; index < sorted.length; index += 1) {
+        expect(sorted[index]! - sorted[index - 1]!).toBeGreaterThanOrEqual(placed.diameter);
+      }
+    }
+  });
+
+  test('places the strip and row rings with the thin end zone formulas', () => {
+    expect(weekField.x(72, weekField.strip)).toBeCloseTo(20 + 2.88 * 72);
+    expect(weekField.clampX(0, weekField.strip)).toBe(28);
+    expect(weekField.clampX(400, weekField.strip)).toBe(300);
+    expect(weekField.x(50, weekField.row)).toBeCloseTo(6 + 2.84 * 50);
+    expect(weekField.clampX(0, weekField.row)).toBe(14);
+    expect(weekField.clampX(400, weekField.row)).toBe(282);
+  });
+});
+
+describe('how live bindings', () => {
+  test('binds hits and keeps the market sentence conditional', () => {
+    const lower = howLiveBindings({
+      pick_hits: 23,
+      pick_misses: 6,
+      model_log_loss: 0.559,
+      market_log_loss: 0.506,
+      sample_label: 'small',
+    });
+    expect(lower).toMatchObject({ k: 23, n: 29, marketLower: true, small: true });
+    const higher = howLiveBindings({
+      pick_hits: 10,
+      pick_misses: 2,
+      model_log_loss: 0.4,
+      market_log_loss: 0.5,
+      sample_label: null,
+    });
+    expect(higher?.marketLower).toBe(false);
+    expect(howLiveBindings(null)).toBeNull();
   });
 });
 

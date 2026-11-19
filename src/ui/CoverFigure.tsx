@@ -1,6 +1,6 @@
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
-import { coverFromHomeProb, coverFigure, font, rhythm } from '@/theme/h2';
+import { coverFromHomeProb, coverFigure, font } from '@/theme/h2';
 import { useH2Theme } from '@/theme/ThemeProvider';
 import { useI18n } from '@/i18n/LocaleProvider';
 
@@ -30,31 +30,36 @@ export function CoverFigure({ pHome, favorite, fontScale }: CoverFigureProps) {
         ? t('tb.cover.more9', { team: favorite })
         : t('tb.cover', { team: favorite, n: cover.n });
 
-  return (
-    <View accessibilityLabel={talk}>
-      <View style={[styles.row, stacked ? styles.stack : null]}>
-        {cover.phrase === 'in 10' ? (
-          <Text
-            allowFontScaling={false}
-            maxFontSizeMultiplier={1}
-            style={[styles.figure, { color: palette.text }]}
-          >
-            {cover.n}
-          </Text>
-        ) : null}
+  if (cover.phrase !== 'in 10') {
+    return (
+      <View accessibilityLabel={talk}>
         <Text maxFontSizeMultiplier={1.5} style={[styles.phrase, { color: palette.text }]}>
-          {cover.phrase === 'in 10' ? t('cover.in10.short') : phrase}
+          {phrase}
         </Text>
       </View>
-      {cover.phrase === 'in 10' ? (
+    );
+  }
+  return (
+    <View accessibilityLabel={talk} style={[styles.row, stacked ? styles.stack : null]}>
+      <Text
+        allowFontScaling={false}
+        maxFontSizeMultiplier={1}
+        style={[styles.figure, { color: palette.text }]}
+      >
+        {cover.n}
+      </Text>
+      <View style={styles.side}>
+        <Text maxFontSizeMultiplier={1.3} style={[styles.in10, { color: palette.text }]}>
+          {t('cover.in10.short')}
+        </Text>
         <Text
           maxFontSizeMultiplier={1.5}
           numberOfLines={1}
-          style={[styles.wins, { color: palette.text, marginTop: rhythm.detail.in10ToWins }]}
+          style={[styles.wins, { color: palette.text }]}
         >
           {t('cover.wins', { team: favorite })}
         </Text>
-      ) : null}
+      </View>
     </View>
   );
 }
@@ -65,6 +70,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 12,
   },
+  side: { marginBottom: 8 },
+  in10: { fontFamily: font.sansBold, fontSize: 24, lineHeight: 30 },
   stack: {
     flexDirection: 'column',
     alignItems: 'flex-start',
@@ -85,5 +92,6 @@ const styles = StyleSheet.create({
     fontFamily: font.sansMedium,
     fontSize: 18,
     lineHeight: 24,
+    marginTop: 8,
   },
 });

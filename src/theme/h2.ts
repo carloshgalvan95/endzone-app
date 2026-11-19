@@ -57,6 +57,18 @@ export const rhythm = {
     footerToLink: 8,
     afterLink: 24,
   },
+  how: {
+    bar: 64,
+    padX: 16,
+    afterBar: 16,
+    leadToFirst: 32,
+    kickerToTitle: 8,
+    titleToBody: 16,
+    bodyGap: 12,
+    bodyToChart: 24,
+    stepGap: 48,
+    afterLast: 24,
+  },
 } as const;
 
 export const themePref = {
@@ -413,8 +425,8 @@ export const darkPalette = {
   model: '#5A86D6',
   modelLabel: '#8AA6DC',
   market: '#A9A396',
-  yellow: '#EDB01A',
-  yellowInk: '#151515',
+  accentNav: '#EDB01A',
+  accentNavInk: '#151515',
   logoDisc: '#F4EEDF',
   logoDiscInk: '#151515',
   score: '#F4EEDF',
@@ -447,8 +459,8 @@ export const lightPalette = {
   model: '#22509B',
   modelLabel: '#22509B',
   market: '#5E5950',
-  yellow: '#EDB01A',
-  yellowInk: '#151515',
+  accentNav: '#EDB01A',
+  accentNavInk: '#151515',
   logoDisc: '#151515',
   logoDiscInk: '#F4EEDF',
   score: '#151515',
@@ -552,4 +564,87 @@ export const nav = {
   sideMargin: 16,
   bottomGap: 12, // más inset del sistema
   listPaddingBottom: (inset = 0) => 64 + 12 + inset + 16,
+} as const;
+
+// Masthead strip lanes. x never moves. Up to 3 lanes. Never hide a ring.
+export const stripLanes = {
+  laneCenters: [36, 16, 56] as const,
+  maxLanes: 3,
+  ring: { diameter: 16, stroke: 3 },
+  ringMin: { diameter: 12, stroke: 2.5 },
+  gap: 4,
+  moveDuration: 200,
+} as const;
+
+export function assignStripLanes(xs: readonly { id: string; x: number; kickoff: number }[]): {
+  diameter: number;
+  stroke: number;
+  lanes: Record<string, { x: number; y: number }>;
+} {
+  const order = [...xs].sort(
+    (a, b) => a.x - b.x || a.kickoff - b.kickoff || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+  );
+  const place = (d: number, strict: boolean) => {
+    const minDx = d + stripLanes.gap;
+    const last = [-Infinity, -Infinity, -Infinity];
+    const lanes: Record<string, { x: number; y: number }> = {};
+    for (const ring of order) {
+      let lane = -1;
+      if (strict) {
+        lane = [0, 1, 2].find((index) => ring.x - last[index]! >= minDx) ?? -1;
+        if (lane < 0) {
+          return null;
+        }
+      } else {
+        const open = [0, 1, 2].find((index) => ring.x - last[index]! >= minDx);
+        lane =
+          open ??
+          [0, 1, 2].reduce((best, index) =>
+            ring.x - last[index]! > ring.x - last[best]! ? index : best,
+          );
+      }
+      last[lane] = ring.x;
+      lanes[ring.id] = { x: ring.x, y: stripLanes.laneCenters[lane]! };
+    }
+    return lanes;
+  };
+  const big = place(stripLanes.ring.diameter, true);
+  if (big) {
+    return { ...stripLanes.ring, lanes: big };
+  }
+  const small = place(stripLanes.ringMin.diameter, true);
+  if (small) {
+    return { ...stripLanes.ringMin, lanes: small };
+  }
+  return { ...stripLanes.ringMin, lanes: place(stripLanes.ringMin.diameter, false)! };
+}
+
+export const weekField = {
+  row: { width: 296, height: 24, endZone: 6, play: 284, clamp: [14, 282] as const },
+  strip: { width: 328, height: 72, endZone: 20, play: 288, clamp: [28, 300] as const },
+  playFieldInCard: { dark: '#14181C', light: '#F4EEDF' },
+  x: (pHomePercent: number, frame: { width: number; endZone: number }) =>
+    frame.endZone + (frame.width - 2 * frame.endZone) * (pHomePercent / 100),
+  clampX: (x: number, frame: { clamp: readonly [number, number] }) =>
+    Math.min(frame.clamp[1], Math.max(frame.clamp[0], x)),
+} as const;
+
+export const weekCard = {
+  marginX: 16,
+  padding: 16,
+  gap: 12,
+  radius: 16,
+  border: 1,
+  contentWidth: 296,
+  logoToName: 12,
+  box: 136,
+} as const;
+
+export const howCalibration = {
+  pred: [0.277, 0.376, 0.435, 0.485, 0.536, 0.587, 0.638, 0.687, 0.752, 0.836] as const,
+  obs: [0.298, 0.246, 0.474, 0.386, 0.456, 0.614, 0.649, 0.667, 0.719, 0.895] as const,
+  nBin: 57,
+  nHoldout: 570,
+  holdoutModel: 0.621,
+  holdoutMarket: 0.598,
 } as const;

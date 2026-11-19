@@ -110,7 +110,7 @@ export function BottomNav() {
       ]}
     >
       {items.map((item) => {
-        const color = item.match ? palette.textInverse : palette.textMuted;
+        const color = item.match ? palette.accentNavInk : palette.textMuted;
         return (
           <Pressable
             key={item.href}
@@ -123,7 +123,18 @@ export function BottomNav() {
             }}
             style={styles.item}
           >
-            <View style={[styles.indicator, item.match ? { backgroundColor: palette.text } : null]}>
+            <View
+              style={[
+                styles.indicator,
+                item.match
+                  ? {
+                      backgroundColor: palette.accentNav,
+                      borderWidth: palette.bg === '#F4EEDF' ? 1.5 : 0,
+                      borderColor: palette.accentNavInk,
+                    }
+                  : null,
+              ]}
+            >
               {item.icon === 'week' ? <WeekIcon color={color} /> : null}
               {item.icon === 'history' ? <HistoryIcon color={color} /> : null}
               {item.icon === 'settings' ? <SettingsIcon color={color} active={item.match} /> : null}

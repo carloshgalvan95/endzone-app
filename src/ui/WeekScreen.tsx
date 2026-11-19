@@ -15,20 +15,21 @@ import { useSlate, useTeams } from '@/data/queries';
 import { useI18n } from '@/i18n/LocaleProvider';
 import {
   coverFromHomeProb,
-  field,
   font,
+  lightPalette,
   motion,
   nav,
   opacity,
   rhythm,
   teamLogos,
+  weekCard,
 } from '@/theme/h2';
 import { useH2Theme } from '@/theme/ThemeProvider';
 
 import { BottomNav, ExperimentFooter } from './Chrome';
 import { FieldStrip, ModelStrip } from './FieldStrip';
 import { hapticSelect } from './haptics';
-import { groupByLocalDay, type DayBucket } from './schedule';
+import { dayBucket, groupByLocalDay, type DayBucket } from './schedule';
 import { TeamSlot } from './TeamSlot';
 import { favoritePercentLabel, weekRowFigure } from './weekFigure';
 import { favoriteName, formatLocalWhen, gamePhase, shortName } from './weekModel';
@@ -160,6 +161,11 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
       ? []
       : slate.weeks_available.filter((week) => Math.abs(week - currentWeek) <= 1);
   const groups = groupByLocalDay(slate.games, now);
+  const nextGame = [...slate.games]
+    .filter((game) => game.status !== 'final')
+    .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))
+    .find((game) => Date.parse(game.kickoff) >= now);
+  const nextAt = nextGame ? Date.parse(nextGame.kickoff) : NaN;
   const collapse = scrollY.interpolate({
     inputRange: [motion.heroCollapseScroll.compactFrom, motion.heroCollapseScroll.compactVisible],
     outputRange: [0, 1],
@@ -191,14 +197,16 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
           },
         ]}
       >
-        <Text style={[styles.kicker, { color: palette.text }]}>{t('week.kicker')}</Text>
-        <Text style={[styles.compactNumber, { color: palette.text }]}>{weekNumber}</Text>
-        <View style={[styles.chip, { borderColor: palette.text }]}>
-          <Text style={[styles.chipText, { color: palette.text }]}>{t('alpha')}</Text>
+        <View style={styles.compactRow}>
+          <Text style={[styles.kicker, { color: palette.text }]}>{t('week.kicker')}</Text>
+          <Text style={[styles.compactNumber, { color: palette.text }]}>{weekNumber}</Text>
+          <View style={[styles.chip, { borderColor: palette.text, alignSelf: 'center' }]}>
+            <Text style={[styles.chipText, { color: palette.text }]}>{t('alpha')}</Text>
+          </View>
+          <Text numberOfLines={1} style={[styles.saved, { color: palette.textMuted }]}>
+            {saved}
+          </Text>
         </View>
-        <Text numberOfLines={1} style={[styles.saved, { color: palette.textMuted }]}>
-          {saved}
-        </Text>
       </Animated.View>
       <Animated.ScrollView
         style={styles.list}
@@ -221,23 +229,30 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
       >
         <Animated.View style={mastheadStyle}>
           <Text style={[styles.kicker, { color: palette.text }]}>{t('week.kicker')}</Text>
-          <Text allowFontScaling={false} style={[styles.display, { color: palette.text }]}>
-            {weekNumber}
-          </Text>
-          <Text style={[styles.meta, { color: palette.text }]}>
-            {t('week.count', { n: slate.games.length })}
-            {saved ? `   ${saved}` : ''}
-          </Text>
-          <View style={[styles.chip, styles.chipGap, { borderColor: palette.text }]}>
-            <Text style={[styles.chipText, { color: palette.text }]}>{t('alpha')}</Text>
+          <View style={styles.mastheadRow}>
+            <Text allowFontScaling={false} style={[styles.display, { color: palette.text }]}>
+              {weekNumber}
+            </Text>
+            <View style={styles.mastheadMeta}>
+              <Text style={[styles.meta, { color: palette.text }]}>
+                {t('week.count', { n: slate.games.length })}
+              </Text>
+              {saved ? (
+                <Text style={[styles.meta, { color: palette.textMuted }]}>{saved}</Text>
+              ) : null}
+              <View style={[styles.chip, { borderColor: palette.text, marginTop: 8 }]}>
+                <Text style={[styles.chipText, { color: palette.text }]}>{t('alpha')}</Text>
+              </View>
+            </View>
           </View>
           {nearby.length > 0 ? (
             <View style={styles.orbs}>
               {nearby.map((week) => {
                 const current = week === currentWeek;
+                const light = palette.bg === lightPalette.bg;
                 return (
                   <Pressable
-                    key={week}
+                    key={`week-${week}`}
                     accessibilityRole="button"
                     accessibilityState={{ selected: current }}
                     onPress={() => {
@@ -250,22 +265,39 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
                     style={({ pressed }) => [
                       styles.orb,
                       {
-                        borderColor: current ? palette.text : palette.textMuted,
-                        borderWidth: current ? 2 : 1,
+                        backgroundColor: current ? palette.accentNav : 'transparent',
+                        borderColor: current
+                          ? light
+                            ? palette.accentNavInk
+                            : 'transparent'
+                          : palette.textMuted,
+                        borderWidth: current ? (light ? 1.5 : 0) : 1.5,
                         opacity: pressed ? opacity.pressed : 1,
                       },
                     ]}
                   >
-                    <Text style={[styles.orbText, { color: palette.text }]}>{week}</Text>
+                    <Text
+                      style={[
+                        styles.orbText,
+                        { color: current ? palette.accentNavInk : palette.text },
+                      ]}
+                    >
+                      {week}
+                    </Text>
                   </Pressable>
                 );
               })}
             </View>
           ) : null}
-          <ModelStrip
-            values={slate.games.map((game) => game.model_home_wp)}
-            height={field.stripHeight}
-          />
+          <View style={{ marginTop: 12 }}>
+            <ModelStrip
+              games={slate.games.map((game) => ({
+                id: game.game_id,
+                pHome: game.model_home_wp,
+                kickoff: game.kickoff,
+              }))}
+            />
+          </View>
         </Animated.View>
         {!online ? (
           <Text style={[styles.banner, { color: palette.text }]}>
@@ -278,37 +310,58 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
         {slate.games.length === 0 ? (
           <Text style={[styles.body, { color: palette.text }]}>{t('week.empty')}</Text>
         ) : null}
-        {groups.map((group, groupIndex) => (
-          <View key={`${group.bucket}-${group.games[0]?.game_id ?? group.at}`}>
-            <Text
-              style={[
-                styles.day,
-                {
-                  color: palette.text,
-                  marginTop:
-                    groupIndex === 0
-                      ? rhythm.week.dayHeaderGapBelow
-                      : rhythm.week.dayHeaderGapAbove,
-                  marginBottom: rhythm.week.dayHeaderGapBelow,
-                },
-              ]}
-            >
-              {dayLabel(group.bucket, group.at, locale, t)}
-            </Text>
-            {group.games.map((game) => (
-              <WeekRow
-                key={game.game_id}
-                game={game}
-                index={slate.games.indexOf(game)}
-                teams={teamsQuery.data ?? null}
-                now={now}
-                locale={locale}
-                selection={selection}
-                reducedMotion={reducedMotion}
-              />
-            ))}
-          </View>
-        ))}
+        {groups.map((group) => {
+          const hot =
+            (group.bucket === 'today' || group.bucket === 'tomorrow') &&
+            Number.isFinite(nextAt) &&
+            dayBucket(nextAt, now) === group.bucket &&
+            new Date(group.at).toDateString() === new Date(nextAt).toDateString();
+          const light = palette.bg === lightPalette.bg;
+          const label = dayLabel(group.bucket, group.at, locale, t);
+          return (
+            <View key={group.games[0]?.game_id ?? `${group.bucket}-${group.at}`}>
+              {hot && light ? (
+                <View
+                  style={[
+                    styles.hotDay,
+                    {
+                      backgroundColor: palette.accentNav,
+                      marginTop: 16,
+                      marginBottom: rhythm.week.dayHeaderGapBelow,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.day, { color: palette.accentNavInk }]}>{label}</Text>
+                </View>
+              ) : (
+                <Text
+                  style={[
+                    styles.day,
+                    {
+                      color: hot ? palette.accentNav : palette.text,
+                      marginTop: 16,
+                      marginBottom: rhythm.week.dayHeaderGapBelow,
+                    },
+                  ]}
+                >
+                  {label}
+                </Text>
+              )}
+              {group.games.map((game) => (
+                <WeekRow
+                  key={game.game_id}
+                  game={game}
+                  index={slate.games.indexOf(game)}
+                  teams={teamsQuery.data ?? null}
+                  now={now}
+                  locale={locale}
+                  selection={selection}
+                  reducedMotion={reducedMotion}
+                />
+              ))}
+            </View>
+          );
+        })}
         <View style={{ marginTop: rhythm.week.fieldToNext }}>
           <ExperimentFooter onHow={() => router.push('/how')} />
         </View>
@@ -316,6 +369,13 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
       <BottomNav />
     </View>
   );
+}
+
+function nameLook(strong: boolean, palette: { text: string; textMuted: string }) {
+  return {
+    color: strong ? palette.text : palette.textMuted,
+    fontFamily: strong ? font.sansBold : font.sans,
+  };
 }
 
 function dayLabel(
@@ -433,56 +493,64 @@ function WeekRow({
           })
         }
         style={({ pressed }) => [
-          styles.row,
-          { marginBottom: rhythm.week.fieldToNext, opacity: pressed ? opacity.pressed : 1 },
+          styles.card,
+          {
+            backgroundColor: palette.surface,
+            borderColor: palette.border,
+            marginBottom: weekCard.gap,
+            opacity: pressed ? opacity.pressed : 1,
+          },
         ]}
       >
+        <Text style={[styles.kicker, { color: palette.textMuted, marginBottom: 8 }]}>{kicker}</Text>
         <View style={styles.rowTop}>
-          <View style={styles.logoCol}>
-            <TeamSlot
-              name={awayName}
-              abbr={game.away}
-              color={away?.team_color ?? null}
-              logoUrl={away?.logo ?? null}
-              size={teamLogos.sizeRow}
-            />
-            <TeamSlot
-              name={homeName}
-              abbr={game.home}
-              color={home?.team_color ?? null}
-              logoUrl={home?.logo ?? null}
-              size={teamLogos.sizeRow}
-            />
-          </View>
           <View style={styles.names}>
-            <Text
-              style={[
-                styles.kicker,
-                { color: palette.text, marginBottom: rhythm.week.rowKickerGap },
-              ]}
-            >
-              {kicker}
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={[
-                styles.team,
-                { color: awayWins || phase !== 'final' ? palette.text : palette.textMuted },
-                awayWins || (named && awayShort === favShort) ? styles.teamFav : null,
-              ]}
-            >
-              {awayShort}
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={[
-                styles.team,
-                { color: homeWins || phase !== 'final' ? palette.text : palette.textMuted },
-                homeWins || (named && homeShort === favShort) ? styles.teamFav : null,
-              ]}
-            >
-              {homeShort}
-            </Text>
+            <View style={styles.nameLine}>
+              <TeamSlot
+                name={awayName}
+                abbr={game.away}
+                color={away?.team_color ?? null}
+                logoUrl={away?.logo ?? null}
+                size={teamLogos.sizeRow}
+              />
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.team,
+                  nameLook(
+                    phase === 'final' || phase === 'tie'
+                      ? awayWins
+                      : named && awayShort === favShort,
+                    palette,
+                  ),
+                ]}
+              >
+                {awayShort}
+              </Text>
+            </View>
+            <View style={styles.nameLine}>
+              <TeamSlot
+                name={homeName}
+                abbr={game.home}
+                color={home?.team_color ?? null}
+                logoUrl={home?.logo ?? null}
+                size={teamLogos.sizeRow}
+              />
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.team,
+                  nameLook(
+                    phase === 'final' || phase === 'tie'
+                      ? homeWins
+                      : named && homeShort === favShort,
+                    palette,
+                  ),
+                ]}
+              >
+                {homeShort}
+              </Text>
+            </View>
           </View>
           {phase === 'final' || phase === 'tie' ? (
             <View style={styles.figure}>
@@ -525,7 +593,7 @@ function WeekRow({
             </View>
           )}
         </View>
-        <View style={{ marginTop: rhythm.week.namesToField }}>
+        <View style={{ marginTop: 8 }}>
           <FieldStrip
             pHome={game.model_home_wp}
             height={24}
@@ -583,7 +651,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.9,
     textTransform: 'uppercase',
   },
-  orbs: { flexDirection: 'row', gap: 4, marginTop: 8, marginBottom: 8 },
+  orbs: { flexDirection: 'row', gap: 4, marginTop: 12 },
   orb: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   orbText: { fontFamily: font.sansMedium, fontSize: 14 },
   compactBar: {
@@ -592,12 +660,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
     borderBottomWidth: 1,
   },
+  compactRow: {
+    height: nav.height,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+  },
+  mastheadRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  mastheadMeta: { flex: 1, alignItems: 'flex-end' },
   compactNumber: { fontFamily: font.sansBold, fontSize: 22, lineHeight: 28 },
   banner: { fontFamily: font.sans, fontSize: 14, marginTop: 8 },
   day: {
@@ -607,10 +680,21 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  row: { minHeight: rhythm.week.rowMinHeight },
-  rowTop: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
-  logoCol: { width: teamLogos.sizeRow, gap: 4 },
-  names: { flex: 1 },
+  card: {
+    borderWidth: weekCard.border,
+    borderRadius: weekCard.radius,
+    padding: weekCard.padding,
+  },
+  rowTop: { flexDirection: 'row', gap: 12, alignItems: 'flex-end' },
+  names: { flex: 1, gap: 0 },
+  nameLine: { height: 24, flexDirection: 'row', alignItems: 'center', gap: weekCard.logoToName },
+  hotDay: {
+    alignSelf: 'flex-start',
+    height: 20,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    justifyContent: 'center',
+  },
   team: { fontFamily: font.sansMedium, fontSize: 16, lineHeight: 22 },
   teamFav: { fontFamily: font.sansBold },
   figure: { alignItems: 'flex-end', maxWidth: 128 },

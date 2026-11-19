@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { fieldMarkerX } from '@/slate/field';
-import { field, font, lightPalette, opacity } from '@/theme/h2';
+import { assignStripLanes, field, font, lightPalette, weekField } from '@/theme/h2';
 import { useH2Theme } from '@/theme/ThemeProvider';
 
 type FieldStripProps = {
@@ -13,49 +13,83 @@ type FieldStripProps = {
   ringLabel?: string;
 };
 
-const YARDS = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+const YARDS = [10, 20, 30, 40, 60, 70, 80, 90];
 
-export function ModelStrip({ values, height }: { values: number[]; height: number }) {
+function Midline({ light, color, ink }: { light: boolean; color: string; ink: string }) {
+  if (!light) {
+    return <View style={[styles.mid, { width: 2, marginLeft: -1, backgroundColor: color }]} />;
+  }
+  return (
+    <View style={[styles.mid, { width: 4, marginLeft: -2, flexDirection: 'row' }]}>
+      <View style={{ width: 1, backgroundColor: ink }} />
+      <View style={{ width: 2, backgroundColor: color }} />
+      <View style={{ width: 1, backgroundColor: ink }} />
+    </View>
+  );
+}
+
+export function ModelStrip({ games }: { games: { id: string; pHome: number; kickoff: string }[] }) {
   const { palette } = useH2Theme();
   const light = palette.bg === lightPalette.bg;
+  const frame = weekField.strip;
+  const placed = assignStripLanes(
+    games.map((game) => ({
+      id: game.id,
+      x: weekField.clampX(weekField.x(game.pHome * 100, frame), frame),
+      kickoff: Number.isFinite(Date.parse(game.kickoff)) ? Date.parse(game.kickoff) : 0,
+    })),
+  );
+  const zone = `${(frame.endZone / frame.width) * 100}%`;
   return (
-    <View style={[styles.field, { height, width: '100%', backgroundColor: palette.playField }]}>
-      <View style={[styles.cap, styles.left, { backgroundColor: palette.fieldCap }]} />
-      <View style={[styles.cap, styles.right, { backgroundColor: palette.fieldCap }]} />
+    <View
+      style={[
+        styles.field,
+        { height: frame.height, width: '100%', backgroundColor: palette.playField },
+      ]}
+    >
+      <View
+        style={[styles.zonePct, styles.left, { width: zone, backgroundColor: palette.crimsonHero }]}
+      />
+      <View
+        style={[
+          styles.zonePct,
+          styles.right,
+          { width: zone, backgroundColor: palette.crimsonHero },
+        ]}
+      />
       {YARDS.map((yard) => (
         <View
-          key={yard}
+          key={`tick-${yard}`}
           style={[
             styles.tick,
             {
-              left: `${((field.endZone + (yard / 100) * field.play) / field.width) * 100}%`,
-              backgroundColor:
-                yard === 50 && !light
-                  ? palette.text
-                  : yard === 50
-                    ? palette.textMuted
-                    : palette.fieldTick,
-              opacity: yard === 50 && !light ? opacity.fieldMid : 1,
+              left: `${(weekField.x(yard, frame) / frame.width) * 100}%`,
+              backgroundColor: palette.fieldTick,
             },
           ]}
         />
       ))}
-      {values.map((pHome, index) => {
-        const marker = fieldMarkerX(pHome);
-        const ringLeft = ((marker - field.modelRing / 2) / field.width) * 100;
+      <Midline light={light} color={palette.accentNav} ink={palette.accentNavInk} />
+      {games.map((game) => {
+        const lane = placed.lanes[game.id];
+        if (!lane) {
+          return null;
+        }
+        const size = placed.diameter;
         return (
           <View
-            key={`${pHome}-${index}`}
+            key={game.id}
             style={[
               styles.ring,
               {
-                left: `${ringLeft}%`,
-                top: (height - field.modelRing) / 2,
+                left: `${((lane.x - size / 2) / frame.width) * 100}%`,
+                top: lane.y - size / 2,
+                width: size,
+                height: size,
+                borderRadius: size / 2,
+                borderWidth: placed.stroke,
                 borderColor: palette.model,
-                width: field.modelRing,
-                height: field.modelRing,
-                borderRadius: field.modelRing / 2,
-                borderWidth: field.modelStroke,
+                backgroundColor: palette.playField,
               },
             ]}
           />
@@ -68,59 +102,61 @@ export function ModelStrip({ values, height }: { values: number[]; height: numbe
 export function FieldStrip({ pHome, height, width, variant, caption, ringLabel }: FieldStripProps) {
   const { palette } = useH2Theme();
   const light = palette.bg === lightPalette.bg;
-  const marker = fieldMarkerX(pHome);
-  const ringLeft = ((marker - field.modelRing / 2) / field.width) * 100;
+  const row = variant === 'mini';
+  const frame = row ? weekField.row : null;
+  const play = row
+    ? light
+      ? weekField.playFieldInCard.light
+      : weekField.playFieldInCard.dark
+    : palette.playField;
+  const marker = frame
+    ? weekField.clampX(weekField.x(pHome * 100, frame), frame)
+    : fieldMarkerX(pHome);
+  const basis = frame ? frame.width : field.width;
+  const ringSize = field.modelRing;
+  const ringLeft = ((marker - ringSize / 2) / basis) * 100;
+  const zone = frame ? `${(frame.endZone / frame.width) * 100}%` : field.endZone;
   return (
     <View style={[styles.wrap, width ? { width } : null]}>
-      <View
-        style={[
-          styles.field,
-          {
-            height,
-            width: width ?? '100%',
-            backgroundColor: palette.playField,
-          },
-        ]}
-      >
-        {variant === 'detail' ? (
-          <>
-            <View style={[styles.zone, styles.left, { backgroundColor: palette.crimsonHero }]} />
-            <View style={[styles.zone, styles.right, { backgroundColor: palette.crimsonHero }]} />
-          </>
-        ) : (
-          <>
-            <View style={[styles.cap, styles.left, { backgroundColor: palette.fieldCap }]} />
-            <View style={[styles.cap, styles.right, { backgroundColor: palette.fieldCap }]} />
-          </>
-        )}
+      <View style={[styles.field, { height, width: width ?? '100%', backgroundColor: play }]}>
+        <View
+          style={[
+            styles.zonePct,
+            styles.left,
+            { width: zone, backgroundColor: palette.crimsonHero },
+          ]}
+        />
+        <View
+          style={[
+            styles.zonePct,
+            styles.right,
+            { width: zone, backgroundColor: palette.crimsonHero },
+          ]}
+        />
         {YARDS.map((yard) => (
           <View
-            key={yard}
+            key={`tick-${yard}`}
             style={[
               styles.tick,
               {
-                left: `${((field.endZone + (yard / 100) * field.play) / field.width) * 100}%`,
-                backgroundColor:
-                  yard === 50 && !light
-                    ? palette.text
-                    : yard === 50
-                      ? palette.textMuted
-                      : palette.fieldTick,
-                opacity: yard === 50 && !light ? opacity.fieldMid : 1,
+                left: `${((frame ? weekField.x(yard, frame) : field.endZone + (yard / 100) * field.play) / basis) * 100}%`,
+                backgroundColor: palette.fieldTick,
               },
             ]}
           />
         ))}
+        <Midline light={light} color={palette.accentNav} ink={palette.accentNavInk} />
         <View
           style={[
             styles.ring,
             {
               left: `${ringLeft}%`,
-              top: (height - field.modelRing) / 2,
+              top: (height - ringSize) / 2,
               borderColor: palette.model,
-              width: field.modelRing,
-              height: field.modelRing,
-              borderRadius: field.modelRing / 2,
+              backgroundColor: play,
+              width: ringSize,
+              height: ringSize,
+              borderRadius: ringSize / 2,
               borderWidth: field.modelStroke,
             },
           ]}
@@ -128,9 +164,10 @@ export function FieldStrip({ pHome, height, width, variant, caption, ringLabel }
         {ringLabel ? (
           <Text
             maxFontSizeMultiplier={1.3}
+            numberOfLines={1}
             style={[
               styles.ringLabel,
-              variant === 'mini'
+              row
                 ? {
                     color: palette.modelLabel,
                     top: 4,
@@ -163,22 +200,18 @@ export function FieldStrip({ pHome, height, width, variant, caption, ringLabel }
 
 const styles = StyleSheet.create({
   wrap: { gap: 4 },
-  field: { borderRadius: 0, overflow: 'visible' },
-  zone: { position: 'absolute', top: 0, bottom: 0, width: field.endZone },
-  cap: { position: 'absolute', top: 0, bottom: 0, width: 2 },
+  field: { borderRadius: 0, overflow: 'hidden' },
+  zonePct: { position: 'absolute', top: 0, bottom: 0 },
   left: { left: 0 },
   right: { right: 0 },
   tick: { position: 'absolute', top: 0, bottom: 0, width: 1 },
-  ring: { position: 'absolute', backgroundColor: 'transparent' },
+  mid: { position: 'absolute', top: 0, bottom: 0, left: '50%' },
+  ring: { position: 'absolute' },
   ringLabel: {
     position: 'absolute',
     fontFamily: font.monoSemi,
     fontSize: 14,
     lineHeight: 16,
   },
-  caption: {
-    fontFamily: font.monoSemi,
-    fontSize: 14,
-    lineHeight: 16,
-  },
+  caption: { fontFamily: font.monoSemi, fontSize: 14, lineHeight: 16 },
 });

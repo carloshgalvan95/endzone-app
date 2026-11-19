@@ -73,6 +73,7 @@ export function DetailScreen({ game, teams }: { game: Game; teams: TeamsDocument
         scrollEventThrottle={16}
         onScroll={(event) => setCompact(event.nativeEvent.contentOffset.y >= 80)}
         contentContainerStyle={{
+          flexGrow: 1,
           paddingBottom: insets.bottom + rhythm.detail.afterLink,
           paddingHorizontal: rhythm.detail.padX,
         }}
@@ -135,26 +136,47 @@ export function DetailScreen({ game, teams }: { game: Game; teams: TeamsDocument
           </Text>
         </View>
         {phase === 'final' && game.status === 'final' ? (
-          <View style={[styles.scores, { marginTop: rhythm.detail.titleToCover }]}>
+          <View style={{ marginTop: rhythm.detail.titleToCover, gap: 4 }}>
+            {(
+              [
+                { name: shortName(awayName), score: game.away_score, win: game.result === 'away' },
+                { name: shortName(homeName), score: game.home_score, win: game.result === 'home' },
+              ] as const
+            ).map((side) => (
+              <View key={side.name} style={styles.scoreRow}>
+                <Text
+                  style={{
+                    fontFamily: side.win ? font.sansBold : font.sans,
+                    fontSize: 18,
+                    lineHeight: 24,
+                    color: side.win ? palette.text : palette.textMuted,
+                  }}
+                >
+                  {side.name}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: font.monoSemi,
+                    fontSize: 32,
+                    lineHeight: 36,
+                    fontVariant: ['tabular-nums'],
+                    color: side.win ? palette.text : palette.textMuted,
+                  }}
+                >
+                  {side.score}
+                </Text>
+              </View>
+            ))}
             <Text
-              style={[
-                styles.score,
-                game.result === 'away'
-                  ? { color: palette.text, fontFamily: font.sansBold }
-                  : { color: palette.textMuted, fontFamily: font.sans },
-              ]}
+              style={{
+                marginTop: 16,
+                color: palette.text,
+                fontFamily: font.sansMedium,
+                fontSize: 18,
+                lineHeight: 24,
+              }}
             >
-              {shortName(awayName)} {game.away_score}
-            </Text>
-            <Text
-              style={[
-                styles.score,
-                game.result === 'home'
-                  ? { color: palette.text, fontFamily: font.sansBold }
-                  : { color: palette.textMuted, fontFamily: font.sans },
-              ]}
-            >
-              {shortName(homeName)} {game.home_score}
+              {t('cover.old', { n: cover.n, team: shortName(fav) })}
             </Text>
           </View>
         ) : (
@@ -223,19 +245,20 @@ export function DetailScreen({ game, teams }: { game: Game; teams: TeamsDocument
             />
           ))}
         </View>
-        <Text
-          maxFontSizeMultiplier={1.5}
-          style={[styles.body, { color: palette.text, marginTop: rhythm.detail.dotsToPhrase }]}
-        >
-          {cover.phrase === 'Toss-up'
-            ? t('detail.dots.tossup')
-            : cover.phrase === 'More than 9 in 10'
-              ? t('tb.cover.more9', { team: fav })
-              : t('detail.dots', { team: fav, n: cover.n })}
-        </Text>
-        <View style={{ marginTop: rhythm.detail.phraseToFooter }}>
-          <ExperimentFooter onHow={() => router.push('/how')} />
-        </View>
+        {phase === 'final' ? null : (
+          <Text
+            maxFontSizeMultiplier={1.5}
+            style={[styles.body, { color: palette.text, marginTop: rhythm.detail.dotsToPhrase }]}
+          >
+            {cover.phrase === 'Toss-up'
+              ? t('detail.dots.tossup')
+              : cover.phrase === 'More than 9 in 10'
+                ? t('tb.cover.more9', { team: fav })
+                : t('detail.dots', { team: fav, n: cover.n })}
+          </Text>
+        )}
+        <View style={{ flexGrow: 1, minHeight: rhythm.detail.phraseToFooter }} />
+        <ExperimentFooter onHow={() => router.push('/how')} />
       </ScrollView>
     </View>
   );
@@ -256,6 +279,7 @@ const styles = StyleSheet.create({
   stack: { flexDirection: 'column', alignItems: 'flex-start' },
   match: { fontFamily: font.sansBold, fontSize: 22, flexShrink: 1 },
   scores: { gap: 4 },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   score: { fontFamily: font.monoSemi, fontSize: 32, lineHeight: 36 },
   win: { fontFamily: font.sansBold },
   lose: {},

@@ -12,7 +12,7 @@ import {
 } from '@/features/notifications/tuesday';
 import { useI18n } from '@/i18n/LocaleProvider';
 import type { LocalePreference } from '@/i18n';
-import { font, langOption, nav, opacity, rhythm } from '@/theme/h2';
+import { font, langOption, nav, opacity } from '@/theme/h2';
 import { useH2Theme, useTheme } from '@/theme/ThemeProvider';
 import type { ThemePreference } from '@/theme/resolveTheme';
 
@@ -54,11 +54,13 @@ export function SettingsScreen() {
           paddingTop: insets.top + 16,
           paddingHorizontal: 16,
           paddingBottom: nav.listPaddingBottom(insets.bottom),
-          gap: 16,
+          gap: 0,
         }}
       >
         <Text style={[styles.title, { color: palette.text }]}>{t('set.title')}</Text>
-        <Text style={[styles.kicker, { color: palette.textMuted }]}>{t('set.lang')}</Text>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginBottom: 8 }]}>
+          {t('set.lang')}
+        </Text>
         {options.map((option) => {
           const selected = preference === option.id;
           return (
@@ -83,7 +85,7 @@ export function SettingsScreen() {
         <Text style={[styles.muted, { color: palette.textMuted }]}>
           {t('set.lang.system.help')}
         </Text>
-        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: rhythm.week.padX }]}>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: 16, marginBottom: 8 }]}>
           {t('set.theme')}
         </Text>
         {(
@@ -116,7 +118,7 @@ export function SettingsScreen() {
             </Pressable>
           );
         })}
-        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: rhythm.week.padX }]}>
+        <Text style={[styles.kicker, { color: palette.textMuted, marginTop: 16, marginBottom: 8 }]}>
           {t('set.cache')}
         </Text>
         <View style={styles.row}>
@@ -130,6 +132,7 @@ export function SettingsScreen() {
           </Text>
           <Pressable
             accessibilityRole="button"
+            accessibilityState={{ disabled: savedAt == null }}
             disabled={savedAt == null}
             onPress={() => {
               client.clear();
@@ -143,7 +146,10 @@ export function SettingsScreen() {
             style={styles.clear}
           >
             <Text
-              style={[styles.body, { color: savedAt == null ? palette.textMuted : palette.text }]}
+              style={[
+                styles.body,
+                { color: palette.text, opacity: savedAt == null ? opacity.disabled : 1 },
+              ]}
             >
               {t('set.clear')}
             </Text>
