@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render, waitFor } from '@testing-library/react-native';
 
 import { LocaleProvider } from '@/i18n/LocaleProvider';
+import { howCalibration } from '@/theme/h2';
 import { AppThemeProvider } from '@/theme/ThemeProvider';
 
 import { HowScreen } from './HowScreen';
@@ -56,6 +57,49 @@ describe('how screen bindings', () => {
     expect(view.queryByText(/0\.506/)).toBeNull();
     expect(view.queryByText(/0\.003/)).toBeNull();
     const source = fs.readFileSync(path.join(process.cwd(), 'src/ui/HowScreen.tsx'), 'utf8');
-    expect(source).not.toMatch(/0\.559|0\.506|23 of 29|7,000|0,621/);
+    expect(source).not.toMatch(/0\.559|0\.506|23 of 29|7,000|0,621|0\.621|0\.598/);
+  });
+
+  test('holdout 0.621, 0.598, and 570 come from the bundled file', async () => {
+    const saved = {
+      holdoutModel: howCalibration.holdoutModel,
+      holdoutMarket: howCalibration.holdoutMarket,
+      nHoldout: howCalibration.nHoldout,
+    };
+    await AsyncStorage.setItem('endzone-locale', 'en');
+    const view = await render(
+      <AppThemeProvider mode="light">
+        <LocaleProvider>
+          <HowScreen />
+        </LocaleProvider>
+      </AppThemeProvider>,
+    );
+    try {
+      await waitFor(() => {
+        expect(view.getAllByText(/0\.621/).length).toBeGreaterThan(0);
+      });
+      expect(view.getAllByText(/0\.598/).length).toBeGreaterThan(0);
+      expect(view.getByText('570 games')).toBeTruthy();
+      howCalibration.holdoutModel = 0.412;
+      howCalibration.holdoutMarket = 0.401;
+      howCalibration.nHoldout = 999;
+      view.rerender(
+        <AppThemeProvider mode="light">
+          <LocaleProvider>
+            <HowScreen />
+          </LocaleProvider>
+        </AppThemeProvider>,
+      );
+      await waitFor(() => {
+        expect(view.getAllByText(/0\.412/).length).toBeGreaterThan(0);
+      });
+      expect(view.queryByText(/0\.621/)).toBeNull();
+      expect(view.getAllByText(/0\.401/).length).toBeGreaterThan(0);
+      expect(view.getByText('999 games')).toBeTruthy();
+    } finally {
+      howCalibration.holdoutModel = saved.holdoutModel;
+      howCalibration.holdoutMarket = saved.holdoutMarket;
+      howCalibration.nHoldout = saved.nHoldout;
+    }
   });
 });

@@ -9,7 +9,7 @@ import { darkPalette, field, font, nav } from '@/theme/h2';
 import { BottomNav } from './Chrome';
 
 export function HistoryScreen() {
-  const { t, locale } = useI18n();
+  const { t, numberLocale } = useI18n();
   const insets = useSafeAreaInsets();
   const query = useTrackRecord();
   const record = query.data;
@@ -62,8 +62,8 @@ export function HistoryScreen() {
                           ? t('tb.dumbbell.none', { n: week.week })
                           : t('tb.dumbbell', {
                               n: week.week,
-                              mo: formatLoss(week.model_log_loss, locale),
-                              mk: formatLoss(week.market_log_loss, locale),
+                              mo: formatLoss(week.model_log_loss, numberLocale),
+                              mk: formatLoss(week.market_log_loss, numberLocale),
                             })
                       }
                       model={week.model_log_loss}

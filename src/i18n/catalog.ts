@@ -171,7 +171,7 @@ export const en = {
   'how.s5.p1':
     'The curve compares what the model said with what later happened, in ten groups of games, from lowest to highest p.',
   'how.s5.p2':
-    'Each group has 57 games. This is the holdout from 2024 to 2025, 570 games, not a live report.',
+    'Each group has 57 games. This is the holdout from 2024 to 2025, {n} games, not a live report.',
   'how.s5.p3': "The strip is the season's correct calls, {k} of {n}, on decided games.",
   'how.s5.pred': 'What the model said',
   'how.s5.obs': 'What happened',
@@ -183,7 +183,7 @@ export const en = {
   'how.s6.p1':
     'Log loss is a score for how close the probabilities were to what happened. Lower is better.',
   'how.s6.p2':
-    'On the holdout from 2024 to 2025, 570 games, the market has a lower log loss than the model, {market} against {model}. This is an open experiment, not a recommendation.',
+    'On the holdout from 2024 to 2025, {n} games, the market has a lower log loss than the model, {market} against {model}. This is an open experiment, not a recommendation.',
   'how.s6.p3': 'The bars share a scale from 0 to 1. Neither bar is colored as a winner.',
   'how.s6.model': 'Model',
   'how.s6.market': 'Market',
@@ -216,7 +216,7 @@ export const en = {
     'The method is public: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md',
   'how.s6.market_lower': 'The market is lower',
   'how.s6.holdout': 'Holdout 2024 to 2025',
-  'how.s6.n': '570 games',
+  'how.s6.n': '{n} games',
   'how.s6.live': '2026 season to date, small sample',
   'how.s6.live_ex': 'Example  0.559 vs 0.506',
 } as const;
@@ -395,7 +395,7 @@ export const es = {
   'how.s5.p1':
     'La curva compara lo que dijo el modelo con lo que ocurrió después, en diez grupos de juegos, de menor a mayor p.',
   'how.s5.p2':
-    'Cada grupo tiene 57 juegos. Este es el holdout de 2024 a 2025, 570 juegos, no un reporte en vivo.',
+    'Cada grupo tiene 57 juegos. Este es el holdout de 2024 a 2025, {n} juegos, no un reporte en vivo.',
   'how.s5.p3': 'La tira es la de aciertos de la temporada, {k} de {n}, en juegos decididos.',
   'how.s5.pred': 'Lo que dijo el modelo',
   'how.s5.obs': 'Lo que ocurrió',
@@ -407,7 +407,7 @@ export const es = {
   'how.s6.p1':
     'El log loss mide qué tan cerca estuvieron las probabilidades de lo que ocurrió. Más bajo es mejor.',
   'how.s6.p2':
-    'En el holdout de 2024 a 2025, 570 juegos, el mercado tiene menor log loss que el modelo, {market} contra {model}. Esto es un experimento abierto, no una recomendación.',
+    'En el holdout de 2024 a 2025, {n} juegos, el mercado tiene menor log loss que el modelo, {market} contra {model}. Esto es un experimento abierto, no una recomendación.',
   'how.s6.p3': 'Las barras comparten una escala de 0 a 1. Ninguna se colorea como ganadora.',
   'how.s6.model': 'Modelo',
   'how.s6.market': 'Mercado',
@@ -440,7 +440,7 @@ export const es = {
     'El método es público: https://github.com/carloshgalvan95/endzone-mlops/blob/main/docs/model_card.md',
   'how.s6.market_lower': 'El mercado queda más bajo',
   'how.s6.holdout': 'Holdout 2024 a 2025',
-  'how.s6.n': '570 juegos',
+  'how.s6.n': '{n} juegos',
   'how.s6.live': 'Temporada 2026 hasta hoy, muestra pequeña',
   'how.s6.live_ex': 'Ejemplo  0,559 contra 0,506',
 } as const;

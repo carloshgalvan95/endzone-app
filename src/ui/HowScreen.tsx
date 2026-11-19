@@ -24,7 +24,7 @@ import {
 const YEARS = [1999, 2016, 2024, 2026] as const;
 
 export function HowScreen() {
-  const { t, locale } = useI18n();
+  const { t, numberLocale } = useI18n();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { palette } = useH2Theme();
@@ -65,7 +65,7 @@ export function HowScreen() {
             stamp={t('how.illustrative')}
             plays={t('how.s1.plays')}
             results={t('how.s1.results')}
-            foot={t('how.s1.foot', { n: formatCount(7000, locale) })}
+            foot={t('how.s1.foot', { n: formatCount(7000, numberLocale) })}
           />
         </Step>
 
@@ -112,7 +112,7 @@ export function HowScreen() {
 
         <Step index={4} n="05" title={t('how.s5.title')} palette={palette}>
           <Body palette={palette}>{t('how.s5.p1')}</Body>
-          <Body palette={palette}>{t('how.s5.p2')}</Body>
+          <Body palette={palette}>{t('how.s5.p2', { n: howCalibration.nHoldout })}</Body>
           <Text style={[styles.stamp, { color: palette.textMuted, marginTop: 24 }]}>
             {t('how.s5.holdout')}
           </Text>
@@ -131,8 +131,9 @@ export function HowScreen() {
           <Body palette={palette}>{t('how.s6.p1')}</Body>
           <Body palette={palette}>
             {t('how.s6.p2', {
-              market: formatLoss(howCalibration.holdoutMarket, locale),
-              model: formatLoss(howCalibration.holdoutModel, locale),
+              n: howCalibration.nHoldout,
+              market: formatLoss(howCalibration.holdoutMarket, numberLocale),
+              model: formatLoss(howCalibration.holdoutModel, numberLocale),
             })}
           </Body>
           <Body palette={palette}>{t('how.s6.p3')}</Body>
@@ -140,17 +141,19 @@ export function HowScreen() {
             label={t('how.s6.holdout')}
             model={howCalibration.holdoutModel}
             market={howCalibration.holdoutMarket}
-            locale={locale}
+            locale={numberLocale}
             palette={palette}
           />
-          <Text style={[styles.foot, { color: palette.textMuted }]}>{t('how.s6.n')}</Text>
+          <Text style={[styles.foot, { color: palette.textMuted }]}>
+            {t('how.s6.n', { n: howCalibration.nHoldout })}
+          </Text>
           {live?.marketLower ? (
             <Text style={[styles.foot, { color: palette.text }]}>{t('how.s6.market_lower')}</Text>
           ) : null}
           <Text style={[styles.small, { color: palette.textMuted }]}>{t('how.s6.live')}</Text>
           <Text style={[styles.small, { color: palette.textMuted }]}>
             {live?.modelLl != null && live.marketLl != null
-              ? formatLivePair(live.modelLl, live.marketLl, locale)
+              ? formatLivePair(live.modelLl, live.marketLl, numberLocale)
               : t('how.chart.empty')}
           </Text>
           <Pressable accessibilityRole="link" onPress={() => Linking.openURL(footUrl || '')}>

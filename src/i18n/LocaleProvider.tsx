@@ -12,13 +12,20 @@ import {
 
 import { hydratePreference } from '@/prefs/hydratePreference';
 
-import { resolveLocale, translate, type AppLocale, type LocalePreference } from './index';
+import {
+  numberLocaleFor,
+  resolveLocale,
+  translate,
+  type AppLocale,
+  type LocalePreference,
+} from './index';
 import { LOCALE_STORAGE_KEY } from './resolve';
 
 const LOCALE_OPTIONS = ['system', 'en', 'es'] as const;
 
 type LocaleValue = {
   locale: AppLocale;
+  numberLocale: string;
   preference: LocalePreference;
   setPreference: (next: LocalePreference) => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
@@ -30,8 +37,10 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const [preference, setPreferenceState] = useState<LocalePreference>('system');
   const [ready, setReady] = useState(false);
   const userChanged = useRef(false);
-  const device = getLocales()[0]?.languageCode ?? 'en';
+  const deviceLocale = getLocales()[0];
+  const device = deviceLocale?.languageCode ?? 'en';
   const locale = resolveLocale(preference, device);
+  const numberLocale = numberLocaleFor(locale, deviceLocale?.languageTag ?? null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +67,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const value = useMemo<LocaleValue>(
     () => ({
       locale,
+      numberLocale,
       preference,
       setPreference: (next) => {
         userChanged.current = true;
@@ -66,7 +76,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       },
       t: (key, vars) => translate(locale, key, vars),
     }),
-    [locale, preference],
+    [locale, numberLocale, preference],
   );
 
   if (!ready) {
@@ -81,6 +91,7 @@ export function useI18n(): LocaleValue {
   if (!value) {
     return {
       locale: 'en',
+      numberLocale: 'en-US',
       preference: 'system',
       setPreference: () => undefined,
       t: (key, vars) => translate('en', key, vars),

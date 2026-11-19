@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { teamLogos } from '@/config/features';
 import { useI18n } from '@/i18n/LocaleProvider';
-import { logoContrastFails } from '@/logos/contrast';
+import { darkLogoMark } from '@/logos/contrast';
 import { logoCacheKey, monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { font, lightPalette } from '@/theme/h2';
 import { useH2Theme } from '@/theme/ThemeProvider';
@@ -14,14 +14,13 @@ type TeamSlotProps = {
   name: string;
   abbr: string;
   color: string | null;
-  color2?: string | null;
   logoUrl: string | null;
   size: number;
 };
 
 type CacheEntry = { url: string; savedAt: number };
 
-export function TeamSlot({ name, abbr, color, color2 = null, logoUrl, size }: TeamSlotProps) {
+export function TeamSlot({ name, abbr, color: _color, logoUrl, size }: TeamSlotProps) {
   const { t } = useI18n();
   const { palette } = useH2Theme();
   const [networkFailed, setNetworkFailed] = useState(false);
@@ -29,7 +28,7 @@ export function TeamSlot({ name, abbr, color, color2 = null, logoUrl, size }: Te
   const [now] = useState(() => Date.now());
   const letters = monogramLetters(abbr, name);
   const dark = palette.bg !== lightPalette.bg;
-  const lowContrast = dark && logoContrastFails([color, color2], palette.surface);
+  const lowContrast = dark && darkLogoMark(abbr) === 'monogram';
   const step = resolveLogoStep({
     enabled: teamLogos.enabled && Boolean(logoUrl),
     cacheSavedAt: cached?.savedAt ?? null,

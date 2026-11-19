@@ -522,7 +522,6 @@ function WeekRow({
                 name={awayName}
                 abbr={game.away}
                 color={away?.team_color ?? null}
-                color2={away?.team_color2 ?? null}
                 logoUrl={away?.logo ?? null}
                 size={teamLogos.sizeRow}
               />
@@ -546,7 +545,6 @@ function WeekRow({
                 name={homeName}
                 abbr={game.home}
                 color={home?.team_color ?? null}
-                color2={home?.team_color2 ?? null}
                 logoUrl={home?.logo ?? null}
                 size={teamLogos.sizeRow}
               />

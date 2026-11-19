@@ -8,6 +8,8 @@
 
 import type { TextStyle } from 'react-native';
 
+import holdoutData from '@/data/how-holdout.json';
+
 export const space = {
   1: 4,
   2: 8,
@@ -640,11 +642,4 @@ export const weekCard = {
   box: 136,
 } as const;
 
-export const howCalibration = {
-  pred: [0.277, 0.376, 0.435, 0.485, 0.536, 0.587, 0.638, 0.687, 0.752, 0.836] as const,
-  obs: [0.298, 0.246, 0.474, 0.386, 0.456, 0.614, 0.649, 0.667, 0.719, 0.895] as const,
-  nBin: 57,
-  nHoldout: 570,
-  holdoutModel: 0.621,
-  holdoutMarket: 0.598,
-} as const;
+export const howCalibration = holdoutData;

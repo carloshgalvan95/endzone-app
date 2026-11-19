@@ -1,7 +1,7 @@
 import { I18n } from 'i18n-js';
 
 import { en, es } from './catalog';
-import { resolveLocale, type AppLocale, type LocalePreference } from './resolve';
+import { numberLocaleFor, resolveLocale, type AppLocale, type LocalePreference } from './resolve';
 
 export const i18n = new I18n({ en, es });
 i18n.enableFallback = true;
@@ -11,7 +11,7 @@ i18n.defaultSeparator = '\u0001';
 i18n.placeholder = /{(\w+)}/g;
 
 export type { AppLocale, LocalePreference };
-export { resolveLocale };
+export { numberLocaleFor, resolveLocale };
 
 export function translate(
   locale: AppLocale,

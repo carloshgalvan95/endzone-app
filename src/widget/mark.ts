@@ -1,3 +1,4 @@
+import { darkLogoMark } from '@/logos/contrast';
 import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
 
 export type WidgetMarkChoice = {
@@ -21,6 +22,7 @@ export function widgetMark(input: {
   networkFailed: boolean;
 }): WidgetMarkChoice {
   const https = input.logoUrl?.startsWith('https:') ? (input.logoUrl as `https:${string}`) : null;
+  const tooFaint = input.enabled && darkLogoMark(input.abbr) === 'monogram';
   const step = resolveLogoStep({
     enabled: input.enabled && https != null,
     cacheSavedAt: input.cacheSavedAt,
@@ -30,6 +32,6 @@ export function widgetMark(input: {
   return {
     letters: monogramLetters(input.abbr, input.name),
     color: input.color,
-    uri: step === 'monogram' ? null : https,
+    uri: step === 'monogram' || tooFaint ? null : https,
   };
 }

@@ -13,3 +13,12 @@ export function resolveLocale(
   const code = (deviceLanguage ?? '').toLowerCase();
   return code.startsWith('es') ? 'es' : 'en';
 }
+
+/** Intl needs a region tag. A bare "es" collapses es-MX into es-ES grouping. */
+export function numberLocaleFor(language: AppLocale, deviceTag: string | null): string {
+  const tag = (deviceTag ?? '').trim();
+  if (language === 'en') {
+    return /^en-[A-Za-z]{2}/.test(tag) ? tag : 'en-US';
+  }
+  return /^es-[A-Za-z]{2}/.test(tag) ? tag : 'es-MX';
+}

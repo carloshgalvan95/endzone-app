@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { translate } from '@/i18n';
-import { resolveLocale } from '@/i18n/resolve';
+import { numberLocaleFor, resolveLocale } from '@/i18n/resolve';
 import { en, es, stringKeys } from '@/i18n/catalog';
 import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { fieldMarkerX, fieldX } from '@/slate/field';
@@ -11,8 +11,14 @@ import { countdownCopy, dayBucket, groupByLocalDay } from '@/ui/schedule';
 import { motionDuration, resolveThemePreference } from '@/theme/resolveTheme';
 import { assignStripLanes, coverFromHomeProb, weekField } from '@/theme/h2';
 import { rowLabelLeft } from '@/ui/FieldStrip';
-import { contrastRatio, logoContrastFails } from '@/logos/contrast';
-import { formatCount, formatLivePair, howLiveBindings, selectHowSummary } from '@/ui/howBindings';
+import { darkLogoMark, darkLogoRatio, meanOpaqueContrast } from '@/logos/contrast';
+import {
+  formatCount,
+  formatLivePair,
+  formatLoss,
+  howLiveBindings,
+  selectHowSummary,
+} from '@/ui/howBindings';
 import { formatCompactWhen } from '@/ui/weekModel';
 import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
@@ -199,10 +205,31 @@ describe('how live bindings', () => {
 });
 
 describe('logo contrast', () => {
-  test('Giants navy on the dark card is under 3 to 1', () => {
-    expect(contrastRatio('#001D67', '#262B30')).toBeCloseTo(1.07, 1);
-    expect(logoContrastFails(['#001D67', '#A71930'], '#262B30')).toBe(true);
-    expect(logoContrastFails(['#5A1414', '#FFB612'], '#262B30')).toBe(false);
+  const teams: { abbr: string; mark: 'monogram' | 'logo' }[] = [
+    { abbr: 'NYG', mark: 'monogram' },
+    { abbr: 'NYJ', mark: 'monogram' },
+    { abbr: 'CAR', mark: 'monogram' },
+    { abbr: 'IND', mark: 'logo' },
+    { abbr: 'ARI', mark: 'logo' },
+    { abbr: 'BUF', mark: 'logo' },
+    { abbr: 'WAS', mark: 'logo' },
+    { abbr: 'BAL', mark: 'logo' },
+    { abbr: 'HOU', mark: 'logo' },
+    { abbr: 'KC', mark: 'logo' },
+  ];
+
+  test('the mean of opaque pixels decides the dark slot', () => {
+    const navy = new Uint8Array([0x00, 0x1d, 0x67, 255, 0x00, 0x1d, 0x67, 10]);
+    expect(meanOpaqueContrast(navy)).toBeCloseTo(1.07, 1);
+    expect(meanOpaqueContrast(new Uint8Array([255, 255, 255, 255])) ?? 0).toBeGreaterThan(3);
+    expect(meanOpaqueContrast(new Uint8Array([255, 255, 255, 10]))).toBeNull();
+  });
+
+  test.each(teams)('$abbr is a $mark from the decoded logo ratio', ({ abbr, mark }) => {
+    const ratio = darkLogoRatio(abbr);
+    expect(ratio).not.toBeNull();
+    expect(darkLogoMark(abbr)).toBe(mark);
+    expect((ratio ?? 0) < 3).toBe(mark === 'monogram');
   });
 });
 
@@ -215,7 +242,12 @@ describe('how fixture gate', () => {
       model_log_loss: 0.612,
       market_log_loss: 0.588,
     });
-    expect(formatCount(7000, 'es')).not.toContain(',');
+    expect(formatLoss(0.612, 'es-MX')).toBe('0.612');
+    expect(formatCount(7000, 'es-MX')).toBe('7,000');
+    expect(formatLoss(0.612, 'es-ES')).toBe('0,612');
+    expect(numberLocaleFor('es', 'es-MX')).toBe('es-MX');
+    expect(numberLocaleFor('es', 'es')).toBe('es-MX');
+    expect(numberLocaleFor('es', 'es-ES')).toBe('es-ES');
   });
 });
 
