@@ -11,6 +11,24 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
+jest.mock('expo-haptics', () => ({
+  selectionAsync: jest.fn(async () => undefined),
+  impactAsync: jest.fn(async () => undefined),
+  performAndroidHapticsAsync: jest.fn(async () => undefined),
+  ImpactFeedbackStyle: { Light: 'light' },
+  AndroidHaptics: { Toggle_On: 'toggle-on', Toggle_Off: 'toggle-off' },
+}));
+
+jest.mock('expo-localization', () => ({
+  getLocales: () => [{ languageCode: 'en' }],
+}));
+
+jest.mock('react-native-android-widget', () => ({
+  registerWidgetTaskHandler: jest.fn(),
+  FlexWidget: 'FlexWidget',
+  TextWidget: 'TextWidget',
+}));
+
 jest.mock('expo-notifications', () => ({
   AndroidImportance: { DEFAULT: 3 },
   SchedulableTriggerInputTypes: { WEEKLY: 'weekly' },

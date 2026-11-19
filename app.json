@@ -2,7 +2,7 @@
   "expo": {
     "name": "endzone",
     "slug": "endzone",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "endzone",
@@ -14,9 +14,11 @@
     },
     "android": {
       "package": "io.github.carloshgalvan95.endzone",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#1B1F23"
       }
     },
@@ -31,15 +33,37 @@
         {
           "backgroundColor": "#1B1F23",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 220
+          "imageWidth": 240
         }
       ],
       "./plugins/withAndroidReleaseSigning",
       "./plugins/withAndroidAbiSplits",
+      "./plugins/withWidgetFonts",
       [
         "expo-notifications",
         {
           "color": "#1B1F23"
+        }
+      ],
+      "expo-localization",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "NextGame",
+              "label": "endzone",
+              "description": "Next game from the model",
+              "minWidth": "110dp",
+              "minHeight": "40dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "maxResizeWidth": "320dp",
+              "maxResizeHeight": "160dp",
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 3600000
+            }
+          ]
         }
       ]
     ]

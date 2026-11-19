@@ -9,3 +9,4 @@ contracts/v1/*.schema.json
 assets
 *.sh
 scripts/fixtures/*.txt
+docs/design
