@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
 
 import type { GameCardModel } from '@/slate/present';
@@ -9,6 +9,7 @@ import { AppText } from './AppText';
 
 type GameCardProps = {
   card: GameCardModel;
+  onPress?: () => void;
 };
 
 function TeamMark({ abbr, logo, ink }: { abbr: string; logo: string | null; ink: string }) {
@@ -96,7 +97,7 @@ function TeamLine({
   );
 }
 
-export function GameCard({ card }: GameCardProps) {
+export function GameCard({ card, onPress }: GameCardProps) {
   const theme = useTheme();
   const final = card.finalScore;
   const awayScoreMuted = final != null && final.winner === 'home';
@@ -108,18 +109,16 @@ export function GameCard({ card }: GameCardProps) {
         ? theme.color.negative
         : theme.color.text;
 
-  return (
-    <View
-      testID={`game-${card.gameId}`}
-      accessibilityLabel={`${card.awayName} at ${card.homeName}. Model ${card.modelPercent}. Market ${card.marketPercent}.`}
-      style={[
-        styles.card,
-        {
-          backgroundColor: theme.color.surface,
-          borderColor: card.disagrees ? theme.color.disagreement : theme.color.border,
-        },
-      ]}
-    >
+  const shellStyle = [
+    styles.card,
+    {
+      backgroundColor: theme.color.surface,
+      borderColor: card.disagrees ? theme.color.disagreement : theme.color.border,
+    },
+  ];
+  const accessibilityLabel = `${card.awayName} at ${card.homeName}. Model ${card.modelPercent}. Market ${card.marketPercent}.`;
+  const body = (
+    <>
       <TeamLine
         abbr={card.awayAbbr}
         name={card.awayName}
@@ -180,7 +179,29 @@ export function GameCard({ card }: GameCardProps) {
         </AppText>
       ) : null}
       <AppText variant="muted">{card.kickoffLabel} CDMX</AppText>
-    </View>
+    </>
+  );
+  if (!onPress) {
+    return (
+      <View
+        testID={`game-${card.gameId}`}
+        accessibilityLabel={accessibilityLabel}
+        style={shellStyle}
+      >
+        {body}
+      </View>
+    );
+  }
+  return (
+    <Pressable
+      testID={`game-${card.gameId}`}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      style={shellStyle}
+    >
+      {body}
+    </Pressable>
   );
 }
 

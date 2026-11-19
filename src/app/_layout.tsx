@@ -15,6 +15,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppHeader } from '@/components/AppHeader';
 import { AppQueryProvider } from '@/data/QueryProvider';
+import { restoreTuesdayAlert } from '@/features/notifications/tuesday';
 import { AppThemeProvider, useTheme } from '@/theme/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -38,6 +39,9 @@ function RootStack() {
         <Stack.Screen name="index" />
         <Stack.Screen name="week" />
         <Stack.Screen name="about" />
+        <Stack.Screen name="record" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="game/[gameId]" />
       </Stack>
     </>
   );
@@ -58,6 +62,10 @@ export default function RootLayout() {
       SplashScreen.hideAsync().catch(() => undefined);
     }
   }, [loaded, error]);
+
+  useEffect(() => {
+    restoreTuesdayAlert().catch(() => undefined);
+  }, []);
 
   if (!loaded && !error) {
     return null;

@@ -16,6 +16,8 @@ export function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const onAbout = pathname === '/about';
+  const onRecord = pathname === '/record';
+  const onSettings = pathname === '/settings';
   const wordmark = theme.mode === 'light' ? brandImages.wordmarkLight : brandImages.wordmarkDark;
 
   return (
@@ -56,6 +58,30 @@ export function AppHeader() {
             <AppText variant="button">Back</AppText>
           </Pressable>
         ) : null}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: onRecord }}
+          onPress={() => router.push('/record')}
+        >
+          <AppText
+            variant="button"
+            style={{ color: onRecord ? theme.color.text : theme.color.textMuted }}
+          >
+            Record
+          </AppText>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: onSettings }}
+          onPress={() => router.push('/settings')}
+        >
+          <AppText
+            variant="button"
+            style={{ color: onSettings ? theme.color.text : theme.color.textMuted }}
+          >
+            Alerts
+          </AppText>
+        </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: onAbout }}

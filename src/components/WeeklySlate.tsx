@@ -35,6 +35,7 @@ type WeeklySlateProps =
       refreshing: boolean;
       onRefresh: () => void;
       onOpenWeeks: () => void;
+      onOpenGame?: (gameId: string) => void;
     };
 
 function SlateIntro({ slate, onOpenWeeks }: { slate: Slate; onOpenWeeks: () => void }) {
@@ -150,7 +151,18 @@ export function WeeklySlate(props: WeeklySlateProps) {
       contentContainerStyle={styles.list}
       data={cards}
       keyExtractor={(item) => item.gameId}
-      renderItem={({ item }) => <GameCard card={item} />}
+      renderItem={({ item }) => (
+        <GameCard
+          card={item}
+          onPress={
+            props.onOpenGame
+              ? () => {
+                  props.onOpenGame?.(item.gameId);
+                }
+              : undefined
+          }
+        />
+      )}
       ListHeaderComponent={header}
       refreshControl={
         <RefreshControl
