@@ -7,7 +7,9 @@ import { en, es, stringKeys } from '@/i18n/catalog';
 import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { fieldMarkerX, fieldX } from '@/slate/field';
 import { coverFromHomeProb } from '@/theme/h2';
+import { favoritePercentLabel, weekRowFigure } from '@/ui/weekFigure';
 import { widgetCopy } from '@/widget/copy';
+import { widgetMark } from '@/widget/mark';
 import { selectNextKickoff, widgetLayout } from '@/widget/select';
 
 const table: { p: number; phrase: string; n: number }[] = [
@@ -92,6 +94,85 @@ describe('logo fallback', () => {
       'monogram',
     );
     expect(monogramLetters('nyg', 'Giants')).toBe('NYG');
+  });
+});
+
+describe('week row figure', () => {
+  test('names the favorite beside the compact figure and drops the name on a toss-up', () => {
+    expect(
+      weekRowFigure({
+        phrase: 'in 10',
+        n: 7,
+        favorite: 'Texans',
+        in10Short: 'in 10',
+        tossup: 'Toss-up',
+        more9: 'More than 9 in 10',
+      }),
+    ).toEqual({ digit: '7', phrase: 'in 10 Texans' });
+    expect(
+      weekRowFigure({
+        phrase: 'in 10',
+        n: 7,
+        favorite: 'Texans',
+        in10Short: 'de 10',
+        tossup: 'Juego parejo',
+        more9: 'Más de 9 de cada 10',
+      }).phrase,
+    ).toBe('de 10 Texans');
+    expect(
+      weekRowFigure({
+        phrase: 'Toss-up',
+        n: 5,
+        favorite: 'Texans',
+        in10Short: 'in 10',
+        tossup: 'Toss-up',
+        more9: 'More than 9 in 10',
+      }),
+    ).toEqual({ digit: null, phrase: 'Toss-up' });
+    expect(favoritePercentLabel(0.3)).toBe('70%');
+    expect(favoritePercentLabel(0.72)).toBe('72%');
+  });
+});
+
+describe('widget monogram', () => {
+  const now = 1_000_000_000_000;
+  test('falls back to a monogram when the flag is off, the cache is cold, or the network fails', () => {
+    expect(
+      widgetMark({
+        enabled: false,
+        abbr: 'ATL',
+        name: 'Falcons',
+        color: '#9A3350',
+        logoUrl: 'https://example.test/atl.png',
+        cacheSavedAt: now,
+        now,
+        networkFailed: false,
+      }).uri,
+    ).toBeNull();
+    const cached = widgetMark({
+      enabled: true,
+      abbr: 'ATL',
+      name: 'Falcons',
+      color: '#9A3350',
+      logoUrl: 'https://example.test/atl.png',
+      cacheSavedAt: now,
+      now,
+      networkFailed: false,
+    });
+    expect(cached.uri).toBe('https://example.test/atl.png');
+    expect(cached.letters).toBe('ATL');
+    const failed = widgetMark({
+      enabled: true,
+      abbr: 'nyj',
+      name: 'Jets',
+      color: null,
+      logoUrl: 'https://example.test/nyj.png',
+      cacheSavedAt: null,
+      now,
+      networkFailed: true,
+    });
+    expect(failed.uri).toBeNull();
+    expect(failed.letters).toBe('NYJ');
   });
 });
 

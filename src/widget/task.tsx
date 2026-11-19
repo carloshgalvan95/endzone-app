@@ -7,10 +7,11 @@ import { DATA_BASE_URL, teamsUrl } from '@/contract/urls';
 import { parseSlate, parseTeams } from '@/contract/validate';
 import { en, es } from '@/i18n/catalog';
 import { LOCALE_STORAGE_KEY, resolveLocale, type LocalePreference } from '@/i18n/resolve';
-import { monogramLetters } from '@/logos/resolve';
+import { LOGO_TTL_MS, logoCacheKey } from '@/logos/resolve';
 import { coverFromHomeProb } from '@/theme/h2';
 
-import { widgetCopy } from './copy';
+import { fill, widgetCopy } from './copy';
+import { widgetMark } from './mark';
 import { NextGameWidget, type WidgetMark } from './NextGameWidget';
 import { selectNextKickoff, widgetLayout } from './select';
 
@@ -61,15 +62,61 @@ function formatWhen(iso: string, locale: string): string {
   }).format(time);
 }
 
-function markFor(abbr: string, teams: ReturnType<typeof parseTeams> | null): WidgetMark {
+async function probe(url: string): Promise<boolean> {
+  try {
+    const response = await fetch(url);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function markFor(
+  abbr: string,
+  teams: ReturnType<typeof parseTeams> | null,
+  now: number,
+  mono: string,
+): Promise<WidgetMark> {
   const team = teams?.teams[abbr];
-  const uri =
-    logoFlag.enabled && team?.logo?.startsWith('https:') ? (team.logo as `https:${string}`) : null;
-  return {
-    letters: monogramLetters(abbr, team?.name ?? abbr),
+  const name = team?.name ?? abbr;
+  const raw = await AsyncStorage.getItem(logoCacheKey(abbr));
+  let cacheSavedAt: number | null = null;
+  let cachedUrl: string | null = null;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as { url?: string; savedAt?: number };
+      if (typeof parsed.savedAt === 'number' && parsed.url?.startsWith('https:')) {
+        cacheSavedAt = parsed.savedAt;
+        cachedUrl = parsed.url;
+      }
+    } catch {
+      cacheSavedAt = null;
+    }
+  }
+  const fresh = cacheSavedAt != null && cachedUrl != null && now - cacheSavedAt < LOGO_TTL_MS;
+  const remote = team?.logo?.startsWith('https:') ? team.logo : null;
+  let networkFailed = false;
+  let logoUrl: string | null = fresh ? cachedUrl : remote;
+  if (logoFlag.enabled && remote && !fresh) {
+    networkFailed = !(await probe(remote));
+    if (networkFailed) {
+      logoUrl = null;
+    } else {
+      logoUrl = remote;
+      await AsyncStorage.setItem(logoCacheKey(abbr), JSON.stringify({ url: remote, savedAt: now }));
+    }
+  }
+  const choice = widgetMark({
+    enabled: logoFlag.enabled,
+    abbr,
+    name,
     color: team?.team_color ?? null,
-    uri,
-  };
+    logoUrl,
+    cacheSavedAt: fresh ? cacheSavedAt : null,
+    now,
+    networkFailed,
+  });
+  return { ...choice, label: fill(mono, { team: name }) };
 }
 
 export async function widgetTaskHandler(props: WidgetTaskHandlerProps): Promise<void> {
@@ -160,6 +207,11 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps): Promise<
   const team = teams?.teams[favorite];
   const favoriteName = team?.name ?? favorite;
   const updatedAt = formatStamp(slate.generated_at, locale);
+  const now = Date.now();
+  const [awayMark, homeMark] = await Promise.all([
+    markFor(next.away, teams, now, strings['logo.cd.mono']),
+    markFor(next.home, teams, now, strings['logo.cd.mono']),
+  ]);
   props.renderWidget(
     <NextGameWidget
       width={props.widgetInfo.width}
@@ -180,8 +232,8 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps): Promise<
       game={{
         id: next.id,
         pHome: next.pHome,
-        awayMark: markFor(next.away, teams),
-        homeMark: markFor(next.home, teams),
+        awayMark,
+        homeMark,
       }}
     />,
   );

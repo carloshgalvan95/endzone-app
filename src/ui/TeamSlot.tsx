@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { teamLogos } from '@/config/features';
 import { useI18n } from '@/i18n/LocaleProvider';
-import { monogramLetters, resolveLogoStep } from '@/logos/resolve';
+import { logoCacheKey, monogramLetters, resolveLogoStep } from '@/logos/resolve';
 import { darkPalette, font } from '@/theme/h2';
 
 type TeamSlotProps = {
@@ -17,10 +17,6 @@ type TeamSlotProps = {
 };
 
 type CacheEntry = { url: string; savedAt: number };
-
-function cacheKey(abbr: string): string {
-  return `endzone-logo-${abbr}`;
-}
 
 export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
   const { t } = useI18n();
@@ -42,7 +38,7 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
       return;
     }
     let active = true;
-    AsyncStorage.getItem(cacheKey(abbr))
+    AsyncStorage.getItem(logoCacheKey(abbr))
       .then((raw) => {
         if (!active || !raw) {
           return;
@@ -67,9 +63,9 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: darkPalette.surface,
-          borderColor: color ?? darkPalette.border,
-          borderWidth: 1.5,
+          backgroundColor: showImage ? 'transparent' : darkPalette.surface,
+          borderColor: color ?? darkPalette.borderStrong,
+          borderWidth: showImage ? 0 : 1.5,
         },
       ]}
     >
@@ -81,7 +77,7 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
           onLoad={() => {
             const entry = { url: logoUrl, savedAt: Date.now() };
             setCached(entry);
-            AsyncStorage.setItem(cacheKey(abbr), JSON.stringify(entry)).catch(() => undefined);
+            AsyncStorage.setItem(logoCacheKey(abbr), JSON.stringify(entry)).catch(() => undefined);
           }}
           onError={() => setNetworkFailed(true)}
           accessibilityIgnoresInvertColors
@@ -92,7 +88,7 @@ export function TeamSlot({ name, abbr, color, logoUrl, size }: TeamSlotProps) {
           style={{
             color: darkPalette.text,
             fontFamily: font.sansBold,
-            fontSize: size >= 32 ? 11 : 8,
+            fontSize: size >= 32 ? 10 : 8,
           }}
         >
           {letters}

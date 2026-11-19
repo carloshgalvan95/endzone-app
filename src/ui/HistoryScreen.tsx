@@ -17,6 +17,7 @@ export function HistoryScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView
+        style={styles.list}
         contentContainerStyle={{
           paddingTop: insets.top + 16,
           paddingHorizontal: 16,
@@ -128,6 +129,7 @@ function Dumbbell({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: darkPalette.bg },
+  list: { flex: 1 },
   block: { gap: 8 },
   kicker: {
     color: darkPalette.textMuted,

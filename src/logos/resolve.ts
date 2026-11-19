@@ -1,5 +1,9 @@
 export const LOGO_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+export function logoCacheKey(abbr: string): string {
+  return `endzone-logo-${abbr}`;
+}
+
 export type LogoStep = 'monogram' | 'cache' | 'network';
 
 /**

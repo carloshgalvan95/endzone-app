@@ -43,6 +43,8 @@ A missing `contract_version` means major 1, because files published before the f
 
 The Android home screen widget is built with `react-native-android-widget` 0.26.0. It does not run in Expo Go. Use a development build (`npx expo run:android`) on Android 12 and 14. It shows the next kickoff, refreshes at most every 60 minutes, and opens `endzone://game/{id}`.
 
+The widget asks the library for Jost (`Jost_400Regular`, `Jost_700Bold`). A prebuild plugin copies those files into `android/app/src/main/assets/fonts`, which is where this library loads a bundled face. If a file is missing, the library uses the system face at weight 700. That system face is acceptable only on the widget. The app itself keeps Jost.
+
 Team logos load at runtime from the contract logo URLs. They are not stored in this repo or in the APK. `teamLogos.enabled` in `src/config/features.ts` is on for now. Turn it off before any store submission. Logos are third-party trademarks. See [docs/team-logos.md](docs/team-logos.md).
 
 ## Download

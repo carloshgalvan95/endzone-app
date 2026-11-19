@@ -37,6 +37,7 @@ export function SettingsScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView
+        style={styles.list}
         contentContainerStyle={{
           paddingTop: insets.top + 16,
           paddingHorizontal: 16,
@@ -100,6 +101,7 @@ export function SettingsScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: darkPalette.bg },
+  list: { flex: 1 },
   title: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 32, lineHeight: 36 },
   kicker: {
     color: darkPalette.textMuted,

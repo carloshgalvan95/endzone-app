@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import mark from '../../assets/images/android-icon-foreground.png';
 
 import { ContractUpdateRequiredError, ContractValidationError } from '@/contract/errors';
 import type { SlateSelection } from '@/contract/urls';
@@ -14,6 +17,7 @@ import { coverFromHomeProb, darkPalette, font, nav, teamLogos } from '@/theme/h2
 import { BottomNav, ExperimentFooter } from './Chrome';
 import { FieldStrip } from './FieldStrip';
 import { TeamSlot } from './TeamSlot';
+import { favoritePercentLabel, weekRowFigure } from './weekFigure';
 import { favoriteName, formatLocalWhen, gamePhase, shortName } from './weekModel';
 
 const FIRST_RUN = 'endzone-first-run-seen';
@@ -40,10 +44,24 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
 
   if (firstRun) {
     return (
-      <View style={[styles.screen, { paddingTop: insets.top + 24 }]}>
-        <Text maxFontSizeMultiplier={1.3} style={styles.wordmark}>
-          endzone-mlops
-        </Text>
+      <View style={[styles.screen, styles.first, { paddingTop: insets.top + 24 }]}>
+        <View style={styles.lockup}>
+          <Image
+            source={mark}
+            style={styles.mark}
+            contentFit="contain"
+            accessibilityIgnoresInvertColors
+          />
+          <Text
+            maxFontSizeMultiplier={1.3}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            style={styles.wordmark}
+          >
+            endzone-mlops
+          </Text>
+        </View>
         <Text maxFontSizeMultiplier={1.5} style={styles.lead}>
           {t('first.lead')}
         </Text>
@@ -100,6 +118,7 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
   return (
     <View style={styles.screen}>
       <ScrollView
+        style={styles.list}
         contentContainerStyle={{
           paddingTop: insets.top + 12,
           paddingBottom: nav.listPaddingBottom(insets.bottom),
@@ -130,12 +149,17 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
           const home = teamsQuery.data?.teams[game.home];
           const awayName = away?.name ?? game.away;
           const homeName = home?.name ?? game.home;
-          const figure =
-            cover.phrase === 'Toss-up'
-              ? t('chip.tossup')
-              : cover.phrase === 'More than 9 in 10'
-                ? t('cover.more9')
-                : String(cover.n);
+          const rowFigure = weekRowFigure({
+            phrase: cover.phrase,
+            n: cover.n,
+            favorite: shortName(fav),
+            in10Short: t('cover.in10.short'),
+            tossup: t('cover.tossup'),
+            more9: t('cover.more9'),
+          });
+          const awayShort = shortName(awayName);
+          const homeShort = shortName(homeName);
+          const named = cover.phrase !== 'Toss-up';
           return (
             <Pressable
               key={game.game_id}
@@ -164,19 +188,40 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
               style={styles.row}
             >
               <View style={styles.rowTop}>
-                <TeamSlot
-                  name={awayName}
-                  abbr={game.away}
-                  color={away?.team_color ?? null}
-                  logoUrl={away?.logo ?? null}
-                  size={teamLogos.sizeRow}
-                />
+                <View style={styles.logoCol}>
+                  <TeamSlot
+                    name={awayName}
+                    abbr={game.away}
+                    color={away?.team_color ?? null}
+                    logoUrl={away?.logo ?? null}
+                    size={teamLogos.sizeRow}
+                  />
+                  <TeamSlot
+                    name={homeName}
+                    abbr={game.home}
+                    color={home?.team_color ?? null}
+                    logoUrl={home?.logo ?? null}
+                    size={teamLogos.sizeRow}
+                  />
+                </View>
                 <View style={styles.names}>
-                  <Text numberOfLines={1} style={styles.team}>
-                    {shortName(awayName)}
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.team,
+                      named && awayShort === shortName(fav) ? styles.teamFav : null,
+                    ]}
+                  >
+                    {awayShort}
                   </Text>
-                  <Text numberOfLines={1} style={styles.team}>
-                    {shortName(homeName)}
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.team,
+                      named && homeShort === shortName(fav) ? styles.teamFav : null,
+                    ]}
+                  >
+                    {homeShort}
                   </Text>
                   <Text style={styles.muted}>{formatLocalWhen(game.kickoff, locale)}</Text>
                 </View>
@@ -191,22 +236,25 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
                   </View>
                 ) : (
                   <View style={styles.figure}>
-                    <Text maxFontSizeMultiplier={1.15} style={styles.rowFigure}>
-                      {figure}
-                    </Text>
-                    {cover.phrase === 'in 10' ? (
-                      <Text style={styles.muted}>{t('cover.in10.short')}</Text>
+                    {rowFigure.digit ? (
+                      <Text maxFontSizeMultiplier={1.15} style={styles.rowFigure}>
+                        {rowFigure.digit}
+                      </Text>
                     ) : null}
+                    <Text maxFontSizeMultiplier={1.3} numberOfLines={2} style={styles.figurePhrase}>
+                      {rowFigure.phrase}
+                    </Text>
                   </View>
                 )}
               </View>
               <FieldStrip
                 pHome={game.model_home_wp}
                 height={24}
-                label={
+                variant="mini"
+                caption={
                   cover.phrase === 'Toss-up'
-                    ? t('chip.tossup')
-                    : `${shortName(fav)} ${Math.round(cover.pFav * 100)}%`
+                    ? t('cover.tossup')
+                    : `${shortName(fav)} ${favoritePercentLabel(game.model_home_wp)}`
                 }
               />
               {phase === 'live' ? <Text style={styles.kicker}>{t('chip.live')}</Text> : null}
@@ -222,7 +270,17 @@ export function WeekScreen({ selection }: { selection: SlateSelection }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: darkPalette.bg },
-  wordmark: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 28 },
+  list: { flex: 1 },
+  first: { paddingHorizontal: 24 },
+  lockup: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  mark: { width: 72, height: 72 },
+  wordmark: {
+    flex: 1,
+    color: darkPalette.text,
+    fontFamily: font.sansBold,
+    fontSize: 28,
+    lineHeight: 34,
+  },
   lead: {
     color: darkPalette.text,
     fontFamily: font.sans,
@@ -243,9 +301,18 @@ const styles = StyleSheet.create({
   banner: { color: darkPalette.text, fontFamily: font.sans, fontSize: 14 },
   row: { paddingVertical: 12, gap: 8, minHeight: 48 },
   rowTop: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  logoCol: { width: teamLogos.sizeRow, gap: 4 },
   names: { flex: 1, gap: 2 },
   team: { color: darkPalette.text, fontFamily: font.sansMedium, fontSize: 16, lineHeight: 22 },
-  figure: { alignItems: 'flex-end' },
+  teamFav: { fontFamily: font.sansBold },
+  figure: { alignItems: 'flex-end', maxWidth: 128 },
+  figurePhrase: {
+    color: darkPalette.text,
+    fontFamily: font.sansMedium,
+    fontSize: 13,
+    lineHeight: 16,
+    textAlign: 'right',
+  },
   rowFigure: { color: darkPalette.text, fontFamily: font.sansBold, fontSize: 48, lineHeight: 48 },
   score: { color: darkPalette.text, fontFamily: font.monoSemi, fontSize: 22 },
   cta: {

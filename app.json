@@ -38,6 +38,7 @@
       ],
       "./plugins/withAndroidReleaseSigning",
       "./plugins/withAndroidAbiSplits",
+      "./plugins/withWidgetFonts",
       [
         "expo-notifications",
         {
